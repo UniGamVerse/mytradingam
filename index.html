@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="it" data-theme="dark">
 <head>
@@ -275,10 +276,15 @@ tbody td.num{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacin
   <div class="logo">
     ▪ MyTradin<em>GAM</em>
     <button onclick="editTitle()" title="Modifica nome" style="background:none;border:none;cursor:pointer;color:var(--dim);font-size:13px;padding:2px 6px;border-radius:4px;transition:color .2s" onmouseover="this.style.color='var(--g)'" onmouseout="this.style.color='var(--dim)'">✎</button>
-    <span style="margin-left:10px;border-left:1px solid var(--b2);padding-left:14px;display:flex;flex-direction:column;gap:1px">
-      <div class="badge loading" id="pbadge">⟳ attesa</div>
-      <div style="font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace" id="lupd">—</div>
-    </span>
+
+<span style="margin-left:10px;border-left:1px solid var(--b2);padding-left:14px;display:flex;flex-direction:column;gap:3px">
+  <div style="display:flex;align-items:center;gap:6px">
+    <span class="dot" id="ldot"></span>
+    <div class="badge loading" id="pbadge">⟳ attesa</div>
+  </div>
+  <div style="font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace" id="lupd">—</div>
+</span>
+
   </div>
   <div class="hstats">
     <div class="hs"><div class="hs-l">Patrimonio totale</div><div class="hs-v pos" id="h-tot">€ 0,00</div></div>
@@ -453,7 +459,7 @@ tbody td.num{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacin
 <div class="panel" id="panel-op">
   <div class="form-grid">
     <div class="fg"><label>Tipo</label><select id="f-type" onchange="onTypeChange()"><option value="buy">ACQUISTO</option><option value="sell">VENDITA</option><option value="split">SPLIT / RAGGRUPPAMENTO</option></select></div>
-    <div class="fg"><label>Ticker</label><input id="f-ticker" placeholder="es. ENI.MI" style="text-transform:uppercase"></div>
+    <div class="fg"><label>Ticker</label><input id="f-ticker" placeholder="es. BIT:NEXI" style="text-transform:uppercase"></div>
     <div class="fg"><label>Data</label><input type="date" id="f-date"></div>
     <div class="fg"><label>Quantità</label><input type="number" id="f-qty" placeholder="100" min="0.0001" step="any"></div>
     <div class="fg"><label>Prezzo €/az.</label><input type="number" id="f-price" placeholder="12.50" min="0" step="any"></div>
@@ -928,9 +934,20 @@ function tkCellSm(ticker) {
 }
 
 function loadGSheetPrices() {
-  return fetch(APPS_SCRIPT_URL)
-    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(function(data) {
+  return new Promise(function(resolve, reject) {
+    var cbName = 'gsCb_' + Date.now();
+    var script = document.createElement('script');
+    var timeout = setTimeout(function() {
+      cleanup();
+      reject(new Error('timeout'));
+    }, 12000);
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cbName] = function(data) {
+      cleanup();
       var newCache = {};
       for (var i = 0; i < data.length; i++) {
         var d = data[i];
@@ -948,8 +965,12 @@ function loadGSheetPrices() {
         lupd.title = 'Fonte: Google Sheet · ' + Object.keys(newCache).length + ' ticker: ' + Object.keys(newCache).join(', ');
         lupd.style.color = 'var(--dim)';
       }
-      return newCache;
-    });
+      resolve(newCache);
+    };
+    script.onerror = function() { cleanup(); reject(new Error('script error')); };
+    script.src = APPS_SCRIPT_URL + '?callback=' + cbName + '&t=' + Date.now();
+    document.head.appendChild(script);
+  });
 }
 
 function fetchPrice(ticker) {
@@ -1001,85 +1022,175 @@ function fetchAll(force) {
     if (fetching) {
       fetching = false;
       setBadge('err', '✕ timeout');
-      document.getElementById('ldot').className = 'dot err';
+var ldot = document.getElementById('ldot');
+if (ldot) ldot.className = 'dot err';
     }
   }, 15000);
-  // Offline check
-  if (!navigator.onLine) {
-    setBadge('err', '✕ offline');
-    document.getElementById('ldot').className = 'dot err';
-    var lupd = document.getElementById('lupd');
+// Offline check
+if (!navigator.onLine) {
+  clearTimeout(safetyTimer);
+
+  setBadge('err', '✕ offline');
+
+  var ldot = document.getElementById('ldot');
+  if (ldot) ldot.className = 'dot err';
+
+  var lupd = document.getElementById('lupd');
+  if (lupd) {
     lupd.textContent = 'Nessuna connessione';
     lupd.style.color = 'var(--r)';
-    return;
   }
+
+  return;
+}
+
+
   var portfolio = getPortfolio();
-  if (portfolio.length === 0) { clearTimeout(safetyTimer); setBadge('ok', '● nessun titolo'); return; }
+  if (portfolio.length === 0) {
+  clearTimeout(safetyTimer);
+  setBadge('ok', '● nessun titolo');
+
+  var ldot = document.getElementById('ldot');
+  if (ldot) ldot.className = 'dot';
+
+  return;
+}
   fetching = true;
   setBadge('loading', '⟳ aggiornamento...');
-  document.getElementById('ldot').className = 'dot loading';
+  var ldot = document.getElementById('ldot');
+if (ldot) ldot.className = 'dot loading';
 
   // Carica tutta la cache una volta sola, poi itera sui ticker
-  loadGSheetPrices().catch(function() {}).then(function() {
+loadGSheetPrices().then(function() {
   var pending = portfolio.slice(), ok = 0, err = 0;
+
   function next() {
     if (pending.length === 0) {
-      clearTimeout(safetyTimer); fetching = false; save(); renderAll();
+      clearTimeout(safetyTimer);
+      fetching = false;
+      save();
+      renderAll();
+
       var now = new Date();
       var dateStr = now.toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit' });
       var timeStr = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+
       var lupd = document.getElementById('lupd');
+      var ldot = document.getElementById('ldot');
+
       if (err === 0) {
         setBadge('ok', '● live');
-        lupd.textContent = 'agg. ' + timeStr + ' · ' + dateStr;
-        lupd.style.color = 'var(--dim)';
+        if (lupd) {
+          lupd.textContent = 'agg. ' + timeStr + ' · ' + dateStr;
+          lupd.style.color = 'var(--dim)';
+        }
       } else if (ok > 0) {
         setBadge('ok', '⚠ parziale');
-        lupd.textContent = 'parz. ' + timeStr + ' · ' + dateStr;
-        lupd.style.color = 'var(--au)';
+        if (lupd) {
+          lupd.textContent = 'parz. ' + timeStr + ' · ' + dateStr;
+          lupd.style.color = 'var(--au)';
+        }
       } else {
         setBadge('err', '✕ no feed');
-        lupd.textContent = 'errore · ' + timeStr;
-        lupd.style.color = 'var(--r)';
+        if (lupd) {
+          lupd.textContent = 'errore · ' + timeStr;
+          lupd.style.color = 'var(--r)';
+        }
       }
-      document.getElementById('ldot').className = (err === 0 || ok > 0) ? 'dot' : 'dot err';
+
+      if (ldot) {
+        ldot.className = (err === 0 || ok > 0) ? 'dot' : 'dot err';
+      }
+
       return;
     }
+
     var pos = pending.shift();
     var cached = prices[pos.ticker];
     var stale = force ? true : (!cached || (Date.now() - cached.ts) > 55000);
-    if (!stale) { ok++; next(); return; }
+
+    if (!stale) {
+      ok++;
+      next();
+      return;
+    }
+
     fetchPrice(pos.ticker).then(function(data) {
       var prev = prices[pos.ticker];
       prices[pos.ticker] = data;
       curPrices[pos.ticker] = data.price;
       checkAlerts(pos.ticker, data.price);
+
       if (prev && Math.abs(prev.price - data.price) > 0.0001) {
         var row = document.getElementById('row-' + pos.ticker);
-        if (row) { row.classList.remove('fu','fd'); void row.offsetWidth; row.classList.add(data.price > prev.price ? 'fu' : 'fd'); }
+        if (row) {
+          row.classList.remove('fu','fd');
+          void row.offsetWidth;
+          row.classList.add(data.price > prev.price ? 'fu' : 'fd');
+        }
       }
-      ok++; next();
-    }).catch(function() { err++; next(); });
+
+      ok++;
+      next();
+    }).catch(function(errTicker) {
+      console.error('Errore ticker:', pos.ticker, errTicker);
+      err++;
+      next();
+    });
   }
+
   next();
-  }); // fine loadGSheetPrices
+
+}).catch(function(errFeed) {
+  clearTimeout(safetyTimer);
+  fetching = false;
+
+  console.error('Errore feed Google Sheet:', errFeed);
+
+  var lupd = document.getElementById('lupd');
+  var ldot = document.getElementById('ldot');
+
+  setBadge('err', '✕ no feed');
+
+  if (lupd) {
+    lupd.textContent = errFeed.message || 'feed non disponibile';
+    lupd.style.color = 'var(--r)';
+  }
+
+  if (ldot) {
+    ldot.className = 'dot err';
+  }
+});
 }
 
 function startLoop() {
   clearInterval(fetchTimer);
   fetchAll(true);
-  fetchTimer = setInterval(function() { fetchAll(false); }, 60000);
-  // Listen for online/offline events
-  window.addEventListener('online', function() { fetchAll(true); });
-  window.addEventListener('offline', function() {
-    setBadge('err', '✕ offline');
-    document.getElementById('ldot').className = 'dot err';
-    var lupd = document.getElementById('lupd');
+  fetchTimer = setInterval(function() {
+    fetchAll(false);
+  }, 60000);
+}
+
+
+function setBadge(state, txt) { var b = document.getElementById('pbadge'); b.textContent = txt; b.className = 'badge' + (state === 'loading' ? ' loading' : state === 'err' ? ' err' : ''); }
+
+
+window.addEventListener('online', function() {
+  fetchAll(true);
+});
+
+window.addEventListener('offline', function() {
+  setBadge('err', '✕ offline');
+
+  var ldot = document.getElementById('ldot');
+  if (ldot) ldot.className = 'dot err';
+
+  var lupd = document.getElementById('lupd');
+  if (lupd) {
     lupd.textContent = 'Nessuna connessione';
     lupd.style.color = 'var(--r)';
-  });
-}
-function setBadge(state, txt) { var b = document.getElementById('pbadge'); b.textContent = txt; b.className = 'badge' + (state === 'loading' ? ' loading' : state === 'err' ? ' err' : ''); }
+  }
+});
 
 // ============================================================
 //  TOAST
