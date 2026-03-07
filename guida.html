@@ -188,6 +188,33 @@ main{margin-left:var(--sidebar-w);flex:1;padding:32px 40px 80px;max-width:calc(8
 
 /* ── SCROLL PROGRESS ── */
 .progress-bar{position:fixed;top:var(--header-h);left:0;height:2px;background:var(--g);z-index:300;transition:width .1s linear;width:0%}
+
+/* ── FOOTER ── */
+footer{
+  margin-left:var(--sidebar-w);
+  border-top:1px solid var(--b1);
+  background:var(--s1);
+  padding:36px 40px;
+}
+.footer-inner{
+  max-width:820px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  text-align:center;
+}
+.footer-logo{
+  font-family:'Inter',sans-serif;font-size:22px;font-weight:700;
+  color:var(--tx);letter-spacing:-.01em;
+}
+.footer-logo em{color:var(--g);font-style:normal}
+.footer-claim{
+  font-size:13px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.12em;
+}
+.footer-meta{
+  font-size:12px;color:var(--muted);margin-top:4px;
+}
+.footer-meta strong{color:var(--dim)}
+@media(max-width:820px){footer{margin-left:0;padding:28px 20px}}
 </style>
 </head>
 <body>
@@ -652,6 +679,18 @@ main{margin-left:var(--sidebar-w);flex:1;padding:32px 40px 80px;max-width:calc(8
   </main>
 </div>
 
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">▪ MyTradin<em>GAM</em></div>
+    <div class="footer-claim">Il tuo portafoglio. Chiaro, sempre.</div>
+    <div class="footer-meta">
+      Un'idea di <strong>GAM</strong> · fatto a mano, con cura ·
+      <span style="color:var(--g)">©</span> <span id="footer-year"></span>
+    </div>
+  </div>
+</footer>
+
 <script>
 // ── Theme ──
 var isDark = true;
@@ -666,6 +705,7 @@ function toggleTheme() {
   applyTheme();
 }
 applyTheme();
+document.getElementById('footer-year').textContent = new Date().getFullYear();
 
 // ── Accordion ──
 function toggleSection(header) {
