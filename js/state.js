@@ -7,11 +7,12 @@ var curPrices = {};
 var alerts    = {};
 var alertLog  = [];
 
-var fondi  = [];   // [ { id, nome, isin, societa, cat, valuta } ]
-var fnMovs = [];   // [ { id, fondoId, tipo:'sub'|'rim', data, quote, nav, comm, _pl? } ]
-var fnNavs = {};   // { fondoId: navCorrente }
+var fondi  = [];
+var fnMovs = [];
+var fnNavs = {};
 
-var portfolioTitle = '';
+var portfolioTitle   = '';
+var patrimonyHistory = []; // [ { date: 'YYYY-MM-DD', val: number } ]
 
 var isDark = true;
 try { isDark = localStorage.getItem('pd3_theme') !== 'light'; } catch(e) {}

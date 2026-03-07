@@ -85,6 +85,7 @@ function renderTtPanel() {
   document.getElementById('tt-bar-fn-pct').textContent = f(fnPct, 1) + '%';
 
   drawTtBar(g.az.mkt, g.fnMkt, g.az.inv, g.fnInv);
+  renderHistChart();
 
   // Tabella unificata
   var tb = document.getElementById('tt-tbody');
@@ -92,7 +93,7 @@ function renderTtPanel() {
   var allCount = azPf.length + fnPfAll.length;
   document.getElementById('tt-pos-count').textContent = azPf.length + ' azioni + ' + fnPfAll.length + ' fondi';
 
-  if (allCount === 0) { tb.innerHTML = '<tr><td colspan="10" class="empty">Nessuna posizione — registra acquisti o sottoscrizioni</td></tr>'; return; }
+  if (allCount === 0) { tb.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="es-icon">📊</div><div class="es-title">Portafoglio vuoto</div><div class="es-sub">Registra il tuo primo acquisto per iniziare a tracciare il patrimonio</div><br><button class="btn btn-g btn-sm" style="margin-top:10px" onclick="goTab(\'op\')">+ Registra operazione</button></td></tr>'; return; }
 
   var rows = '';
   for (var i = 0; i < azPf.length; i++) {
@@ -159,8 +160,23 @@ function renderOvPanel() {
   drawDonut(pf, t.mkt);
 
   var pb = document.getElementById('ov-pos');
-  if (pf.length === 0) { pb.innerHTML = '<tr><td colspan="11" class="empty">Nessuna posizione aperta</td></tr>'; }
+  if (pf.length === 0) { pb.innerHTML = '<tr><td colspan="11" class="empty-state"><div class="es-icon">📈</div><div class="es-title">Nessuna posizione aperta</div><div class="es-sub">Le posizioni appaiono qui dopo il primo acquisto</div><br><button class="btn btn-g btn-sm" style="margin-top:10px" onclick="goTab(\'op\')">+ Registra acquisto</button></td></tr>'; }
   else {
+    // Sorting colonne
+    var stOv = (typeof sortState !== 'undefined' && sortState.ov) ? sortState.ov : { col: 'val', dir: 'desc' };
+    pf = pf.slice().sort(function(a, b) {
+      var cp_a = curPrices[a.ticker] || a.pmc, cp_b = curPrices[b.ticker] || b.pmc;
+      var get = function(p, cp) { return {
+        qty: p.qty, val: p.qty * cp,
+        pl: p.qty * cp - p.cost,
+        plp: p.cost > 0 ? (p.qty * cp - p.cost) / p.cost : 0,
+        cagr: (function(){ var r = cagrForPosition(p.ticker, p.cost, p.qty * cp); return r ? r.cagr : -9999; })()
+      }; };
+      var va = get(a, cp_a), vb = get(b, cp_b);
+      var va_v = va[stOv.col] !== undefined ? va[stOv.col] : va.val;
+      var vb_v = vb[stOv.col] !== undefined ? vb[stOv.col] : vb.val;
+      return stOv.dir === 'asc' ? va_v - vb_v : vb_v - va_v;
+    });
     var rows = '';
     for (var i = 0; i < pf.length; i++) {
       var p = pf[i], cp = curPrices[p.ticker] || p.pmc;
@@ -183,7 +199,7 @@ function renderOvPanel() {
 
   var rb     = document.getElementById('ov-rec');
   var sorted = ops.slice().sort(function(a,b){ return b.date < a.date ? -1 : 1; }).slice(0, 6);
-  if (sorted.length === 0) { rb.innerHTML = '<tr><td colspan="7" class="empty">Nessuna operazione</td></tr>'; }
+  if (sorted.length === 0) { rb.innerHTML = '<tr><td colspan="7" class="empty-state"><div class="es-icon">📝</div><div class="es-title">Nessuna operazione</div><div class="es-sub">Le ultime operazioni registrate appariranno qui</div></td></tr>'; }
   else {
     var rrows = '';
     for (var i = 0; i < sorted.length; i++) {
@@ -207,7 +223,7 @@ function drawDonut(pf, totalMkt) {
   if (pf.length === 0 || totalMkt <= 0) {
     ctx.beginPath(); ctx.arc(100,100,80,0,Math.PI*2); ctx.arc(100,100,50,Math.PI*2,0,true);
     ctx.fillStyle = emptyFill; ctx.fill();
-    document.getElementById('donut-leg').innerHTML = '<div class="empty" style="padding:6px 0">Nessuna posizione</div>'; return;
+    document.getElementById('donut-leg').innerHTML = '<div class="empty-state" style="padding:12px 0;text-align:center"><div class="es-icon">📊</div><div class="es-sub">Nessuna posizione</div></div>'; return;
   }
   var angle = -Math.PI / 2, items = [];
   for (var i = 0; i < pf.length; i++) {
@@ -222,7 +238,8 @@ function drawDonut(pf, totalMkt) {
   var leg = '';
   for (var i = 0; i < items.length; i++) {
     var nm = tickerName(items[i].ticker);
-    leg += '<div class="li"><span class="ld" style="background:' + items[i].color + '"></span><span class="lt">' + items[i].ticker + (nm ? '<br><span style="font-size:10px;color:var(--dim);font-weight:400">' + nm + '</span>' : '') + '</span><span>' + fe(items[i].val) + '</span><span class="lp">' + f(items[i].pct,1) + '%</span></div>';
+    var tkHtml = '<span class="lt">' + items[i].ticker + (nm ? '<br><span style="font-size:10px;color:var(--dim);font-weight:400">' + nm + '</span>' : '') + '</span>';
+    leg += '<div class="li"><span class="ld" style="background:' + items[i].color + '"></span>' + tkHtml + '<span class="lt-val">' + fe(items[i].val) + '</span><span class="lp">' + f(items[i].pct,1) + '%</span></div>';
   }
   document.getElementById('donut-leg').innerHTML = leg;
 }
@@ -232,7 +249,7 @@ function renderOpPanel() {
   var sorted = ops.slice().sort(function(a,b){ return b.date < a.date ? -1 : 1; });
   document.getElementById('op-count').textContent = ops.length + ' operazioni';
   var tb = document.getElementById('op-tbody');
-  if (sorted.length === 0) { tb.innerHTML = '<tr><td colspan="9" class="empty">Nessuna operazione</td></tr>'; return; }
+  if (sorted.length === 0) { tb.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="es-icon">✏️</div><div class="es-title">Nessuna operazione registrata</div><div class="es-sub">Usa il modulo sopra per aggiungere acquisti, vendite o split</div></td></tr>'; return; }
   var rows = '';
   for (var i = 0; i < Math.min(sorted.length, 10); i++) {
     var op = sorted[i];
@@ -253,7 +270,7 @@ function renderOpPanel() {
 function renderLogPanel() {
   var sorted = ops.slice().sort(function(a,b){ return b.date < a.date ? -1 : 1; });
   var tb = document.getElementById('lg-tbody');
-  if (sorted.length === 0) { tb.innerHTML = '<tr><td colspan="10" class="empty">Nessuna operazione</td></tr>'; return; }
+  if (sorted.length === 0) { tb.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="es-icon">📋</div><div class="es-title">Log vuoto</div><div class="es-sub">Tutte le operazioni registrate appariranno qui in ordine cronologico</div><br><button class="btn btn-g btn-sm" style="margin-top:10px" onclick="goTab(\'op\')">+ Prima operazione</button></td></tr>'; return; }
   var rows = '';
   for (var i = 0; i < sorted.length; i++) {
     var op = sorted[i];
@@ -293,7 +310,25 @@ function renderPfPanel() {
   } else { cagrEl.textContent = '—'; cagrEl.className = 'kpi-v dmc'; cagrSEl.textContent = 'inserisci date di acquisto'; }
 
   var tb = document.getElementById('pf-tbody');
-  if (pf.length === 0) { tb.innerHTML = '<tr><td colspan="11" class="empty">Nessuna posizione aperta</td></tr>'; return; }
+  if (pf.length === 0) { tb.innerHTML = '<tr><td colspan="11" class="empty-state"><div class="es-icon">💼</div><div class="es-title">Portafoglio vuoto</div><div class="es-sub">Registra un acquisto per vedere i prezzi live e il dettaglio del portafoglio</div><br><button class="btn btn-g btn-sm" style="margin-top:10px" onclick="goTab(\'op\')">+ Registra acquisto</button></td></tr>'; return; }
+
+  // Sorting colonne
+  var st = (typeof sortState !== 'undefined' && sortState.pf) ? sortState.pf : { col: 'val', dir: 'desc' };
+  pf = pf.slice().sort(function(a, b) {
+    var cp_a = curPrices[a.ticker] || a.pmc, cp_b = curPrices[b.ticker] || b.pmc;
+    var get = function(p, cp) { return {
+      qty: p.qty, price: cp, val: p.qty * cp,
+      pl: p.qty * cp - p.cost,
+      plp: p.cost > 0 ? (p.qty * cp - p.cost) / p.cost : 0,
+      wt: p.qty * cp,
+      cagr: (function(){ var r = cagrForPosition(p.ticker, p.cost, p.qty * cp); return r ? r.cagr : -9999; })()
+    }; };
+    var va = get(a, cp_a), vb = get(b, cp_b);
+    var va_v = va[st.col] !== undefined ? va[st.col] : va.val;
+    var vb_v = vb[st.col] !== undefined ? vb[st.col] : vb.val;
+    return st.dir === 'asc' ? va_v - vb_v : vb_v - va_v;
+  });
+
   var rows = '';
   for (var i = 0; i < pf.length; i++) {
     var p = pf[i], cp = curPrices[p.ticker] || p.pmc;
@@ -349,7 +384,7 @@ function renderZnPanel() {
   var tb      = document.getElementById('zn-tbody');
   var years   = Object.keys(byYear).sort();
   var curYear = new Date().getFullYear();
-  if (years.length === 0) { tb.innerHTML = '<tr><td colspan="6" class="empty">Nessuna vendita registrata</td></tr>'; }
+  if (years.length === 0) { tb.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="es-icon">🎒</div><div class="es-title">Nessuna vendita registrata</div><div class="es-sub">Il saldo delle plusvalenze e minusvalenze per anno apparirà qui</div></td></tr>'; }
   else {
     var rows = '';
     for (var i = 0; i < years.length; i++) {
@@ -367,7 +402,7 @@ function renderZnPanel() {
 
   var otb         = document.getElementById('zn-ops-tbody');
   var sellsSorted = sells.slice().sort(function(a,b){ return b.date < a.date ? -1 : 1; });
-  if (sellsSorted.length === 0) { otb.innerHTML = '<tr><td colspan="9" class="empty">Nessuna vendita registrata</td></tr>'; }
+  if (sellsSorted.length === 0) { otb.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="es-icon">📑</div><div class="es-title">Nessuna vendita</div><div class="es-sub">Il dettaglio fiscale di ogni vendita apparirà qui</div></td></tr>'; }
   else {
     var orows = '';
     for (var i = 0; i < sellsSorted.length; i++) {
@@ -412,7 +447,7 @@ function setAlert(ticker, field, val) {
 function renderAlPanel() {
   var pf    = getPortfolio();
   var cards = document.getElementById('al-cards');
-  if (pf.length === 0) { cards.innerHTML = '<div class="empty">Nessuna posizione aperta — registra prima un acquisto</div>'; }
+  if (pf.length === 0) { cards.innerHTML = '<div class="empty-state" style="padding:40px;text-align:center"><div class="es-icon">🔔</div><div class="es-title">Nessuna posizione</div><div class="es-sub">Gli alert si impostano sulle posizioni aperte. Registra prima un acquisto.</div><br><button class="btn btn-g btn-sm" style="margin-top:10px" onclick="goTab(\'op\')">+ Registra acquisto</button></div>'; }
   else {
     var html = '<div class="alert-grid">';
     for (var i = 0; i < pf.length; i++) {
@@ -431,7 +466,7 @@ function renderAlPanel() {
 
   var ltb = document.getElementById('al-log-tbody');
   document.getElementById('al-log-count').textContent = alertLog.length + ' notifiche';
-  if (alertLog.length === 0) { ltb.innerHTML = '<tr><td colspan="5" class="empty">Nessun alert scattato</td></tr>'; }
+  if (alertLog.length === 0) { ltb.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="es-icon">🟢</div><div class="es-title">Nessun alert scattato</div><div class="es-sub">Lo storico degli alert target e stop loss apparirà qui</div></td></tr>'; }
   else {
     var lrows = '';
     for (var i = 0; i < alertLog.length; i++) {
@@ -441,5 +476,185 @@ function renderAlPanel() {
       lrows += '<td>' + fe(a.threshold) + '</td><td>' + fe(a.price) + '</td></tr>';
     }
     ltb.innerHTML = lrows;
+  }
+}
+
+// ---------- Grafico storico patrimonio ----------
+var histPeriod = '1M';
+var histResizeObs = null;
+
+function setHistPeriod(period, btn) {
+  histPeriod = period;
+  var btns = document.querySelectorAll('.hist-period-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  if (btn) btn.classList.add('active');
+  renderHistChart();
+}
+
+function renderHistChart() {
+  var wrap  = document.getElementById('hist-chart');
+  var empty = document.getElementById('hist-empty');
+  if (!wrap) return;
+
+  // Filtra per periodo
+  var now    = new Date();
+  var cutoff = new Date(now);
+  if      (histPeriod === '1M')  cutoff.setMonth(now.getMonth() - 1);
+  else if (histPeriod === '3M')  cutoff.setMonth(now.getMonth() - 3);
+  else if (histPeriod === '6M')  cutoff.setMonth(now.getMonth() - 6);
+  else if (histPeriod === '1A')  cutoff.setFullYear(now.getFullYear() - 1);
+  else cutoff = new Date('2000-01-01');
+
+  var cutStr = cutoff.toISOString().slice(0, 10);
+  var data   = (patrimonyHistory || []).filter(function(s) { return s.date >= cutStr; });
+
+  if (data.length < 2) {
+    wrap.style.display = 'none';
+    if (empty) { empty.style.display = 'block'; }
+    return;
+  }
+  wrap.style.display = 'block';
+  if (empty) empty.style.display = 'none';
+
+  // Usa Canvas per evitare distorsioni di testo con SVG scalato
+  var existingCanvas = wrap.querySelector('canvas');
+  var canvas = existingCanvas || document.createElement('canvas');
+  if (!existingCanvas) {
+    canvas.style.width  = '100%';
+    canvas.style.height = '160px';
+    canvas.style.display = 'block';
+    wrap.innerHTML = '';
+    wrap.appendChild(canvas);
+  }
+
+  // DPR per retina
+  var dpr = window.devicePixelRatio || 1;
+  var W   = wrap.clientWidth  || wrap.offsetWidth || 600;
+  var H   = 160;
+  canvas.width  = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  var PAD = { top: 20, right: 20, bottom: 30, left: 64 };
+  var cw  = W - PAD.left - PAD.right;
+  var ch  = H - PAD.top  - PAD.bottom;
+
+  var vals  = data.map(function(s) { return s.val; });
+  var minV  = Math.min.apply(null, vals);
+  var maxV  = Math.max.apply(null, vals);
+  var range = maxV - minV || 1;
+  var lo    = minV - range * 0.12;
+  var hi    = maxV + range * 0.12;
+
+  var color     = isDark ? '#00d4a0' : '#00a878';
+  var gridColor = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
+  var textColor = isDark ? '#4d7490' : '#8099a8';
+  var bgColor   = isDark ? '#111418' : '#ffffff';
+
+  function xp(i) { return PAD.left + (data.length > 1 ? (i / (data.length - 1)) * cw : cw / 2); }
+  function yp(v) { return PAD.top + ch - ((v - lo) / (hi - lo)) * ch; }
+
+  // Background
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid lines + Y labels (4 levels)
+  ctx.font = '9px "JetBrains Mono", monospace';
+  ctx.textAlign = 'right';
+  for (var j = 0; j <= 3; j++) {
+    var gv  = lo + (hi - lo) * (j / 3);
+    var gy  = yp(gv);
+    var glb = gv >= 1000000 ? (gv/1000000).toFixed(1) + 'M'
+            : gv >= 1000    ? (gv/1000).toFixed(1) + 'k'
+            : gv.toFixed(0);
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth   = 1;
+    ctx.beginPath();
+    ctx.moveTo(PAD.left, gy);
+    ctx.lineTo(PAD.left + cw, gy);
+    ctx.stroke();
+    ctx.fillStyle = textColor;
+    ctx.fillText('€' + glb, PAD.left - 6, gy + 3.5);
+  }
+
+  // Area fill gradient
+  var grad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + ch);
+  grad.addColorStop(0,   isDark ? 'rgba(0,212,160,0.20)' : 'rgba(0,168,120,0.15)');
+  grad.addColorStop(1,   'rgba(0,0,0,0)');
+
+  ctx.beginPath();
+  ctx.moveTo(xp(0), yp(data[0].val));
+  for (var i = 1; i < data.length; i++) {
+    // Smooth curve con bezier
+    var x0 = xp(i-1), y0 = yp(data[i-1].val);
+    var x1 = xp(i),   y1 = yp(data[i].val);
+    var cpx = (x0 + x1) / 2;
+    ctx.bezierCurveTo(cpx, y0, cpx, y1, x1, y1);
+  }
+  ctx.lineTo(xp(data.length - 1), PAD.top + ch);
+  ctx.lineTo(xp(0), PAD.top + ch);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(xp(0), yp(data[0].val));
+  for (var i = 1; i < data.length; i++) {
+    var x0 = xp(i-1), y0 = yp(data[i-1].val);
+    var x1 = xp(i),   y1 = yp(data[i].val);
+    var cpx = (x0 + x1) / 2;
+    ctx.bezierCurveTo(cpx, y0, cpx, y1, x1, y1);
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth   = 2;
+  ctx.lineJoin    = 'round';
+  ctx.lineCap     = 'round';
+  ctx.stroke();
+
+  // Last point dot
+  var lastX = xp(data.length - 1), lastY = yp(data[data.length - 1].val);
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 2, 0, Math.PI * 2);
+  ctx.fillStyle = bgColor;
+  ctx.fill();
+
+  // X axis labels (max 6)
+  var step = Math.max(1, Math.floor(data.length / 6));
+  ctx.font      = '9px "JetBrains Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = textColor;
+  for (var k = 0; k < data.length; k += step) {
+    ctx.fillText(data[k].date.slice(5).replace('-','/'), xp(k), H - 8);
+  }
+  // Always show last date
+  ctx.fillText(data[data.length-1].date.slice(5).replace('-','/'), xp(data.length-1), H - 8);
+
+  // Delta badge (top right)
+  var first     = data[0].val, last = data[data.length-1].val;
+  var delta     = last - first;
+  var deltaPct  = first > 0 ? (delta / first) * 100 : 0;
+  var deltaSign = delta >= 0 ? '+' : '';
+  var dColor    = delta >= 0 ? color : '#ff4d6a';
+  var dLabel    = deltaSign + deltaPct.toFixed(2) + '%';
+  var dSub      = '(' + deltaSign + (Math.abs(delta) >= 1000 ? (delta/1000).toFixed(1)+'k' : Math.round(delta)) + '€)';
+
+  ctx.font      = 'bold 12px Inter, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillStyle = dColor;
+  ctx.fillText(dLabel, W - PAD.right, PAD.top + 1);
+  ctx.font      = '10px Inter, sans-serif';
+  ctx.fillStyle = textColor;
+  ctx.fillText(dSub, W - PAD.right, PAD.top + 14);
+
+  // ResizeObserver per re-render al cambio larghezza
+  if (!histResizeObs && window.ResizeObserver) {
+    histResizeObs = new ResizeObserver(function() { renderHistChart(); });
+    histResizeObs.observe(wrap);
   }
 }

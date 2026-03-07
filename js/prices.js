@@ -140,6 +140,8 @@ function fetchAll(force) {
         fetching = false;
         save();
         renderAll();
+        // Aggiorna snapshot giornaliero con prezzi live
+        if (typeof saveSnapshot === 'function') saveSnapshot();
         var now = new Date();
         var dateStr = now.toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit' });
         var timeStr = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });

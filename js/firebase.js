@@ -49,14 +49,15 @@ function loadFromFirebase() {
   db.collection('portfolios').doc(currentUser.uid).get().then(function(doc) {
     if (doc.exists) {
       var d = doc.data();
-      ops        = d.ops        || [];
-      curPrices  = d.curPrices  || {};
-      alerts     = d.alerts     || {};
-      alertLog   = d.alertLog   || [];
-      fondi      = d.fondi      || [];
-      fnMovs     = d.fnMovs     || [];
-      fnNavs     = d.fnNavs     || {};
-      portfolioTitle = d.title  || '';
+      ops              = d.ops              || [];
+      curPrices        = d.curPrices        || {};
+      alerts           = d.alerts           || {};
+      alertLog         = d.alertLog         || [];
+      fondi            = d.fondi            || [];
+      fnMovs           = d.fnMovs           || [];
+      fnNavs           = d.fnNavs           || {};
+      portfolioTitle   = d.title            || '';
+      patrimonyHistory = d.patrimonyHistory || [];
       applyTitle();
       if (!portfolioTitle) {
         document.getElementById('modal-setup').classList.add('open');
@@ -66,11 +67,27 @@ function loadFromFirebase() {
     }
     renderAll();
     startLoop();
+    saveSnapshot();
   }).catch(function(e) {
     console.error('Errore caricamento:', e);
     renderAll();
     startLoop();
   });
+}
+
+// ---------- Snapshot giornaliero patrimonio ----------
+function saveSnapshot() {
+  var today = new Date().toISOString().slice(0, 10);
+  var g     = grandTotals();
+  var val   = g.totMkt;
+  if (val <= 0) return; // non salvare se portafoglio vuoto
+  // Rimuovi eventuale snapshot di oggi già presente e aggiorna
+  patrimonyHistory = patrimonyHistory.filter(function(s) { return s.date !== today; });
+  patrimonyHistory.push({ date: today, val: Math.round(val * 100) / 100 });
+  // Tieni max 730 giorni (2 anni)
+  patrimonyHistory.sort(function(a, b) { return a.date < b.date ? -1 : 1; });
+  if (patrimonyHistory.length > 730) patrimonyHistory = patrimonyHistory.slice(-730);
+  saveToFirebase();
 }
 
 function save() {
@@ -99,6 +116,7 @@ function saveToFirebase() {
   var snap = {
     ops: ops, curPrices: curPrices, alerts: alerts, alertLog: alertLog,
     fondi: fondi, fnMovs: fnMovs, fnNavs: fnNavs, title: portfolioTitle,
+    patrimonyHistory: patrimonyHistory,
     updatedAt: new Date().toISOString()
   };
   db.collection('portfolios').doc(currentUser.uid).set(snap).catch(function(e) {

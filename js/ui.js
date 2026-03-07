@@ -51,13 +51,19 @@ function saveSetup() {
 }
 
 // ---------- Tabs ----------
-var TABS = ['tt','ov','op','lg','pf','sm','zn','al','fn','gu'];
+var TABS = ['tt','ov','pf','op','lg','sm','zn','al','fn'];
 function goTab(name) {
   var btns   = document.querySelectorAll('.tab');
   var panels = document.querySelectorAll('.panel');
-  for (var i = 0; i < btns.length; i++) { btns[i].classList.remove('active'); panels[i].classList.remove('active'); }
+  // Deactivate all
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  for (var i = 0; i < panels.length; i++) panels[i].classList.remove('active');
+  // Activate by tab index (button order = TABS array)
   var idx = TABS.indexOf(name);
-  if (idx >= 0) { btns[idx].classList.add('active'); panels[idx].classList.add('active'); }
+  if (idx >= 0 && btns[idx]) btns[idx].classList.add('active');
+  // Activate panel by id
+  var panel = document.getElementById('panel-' + name);
+  if (panel) panel.classList.add('active');
   if (name === 'sm') updateSmTickers();
   if (name === 'fn') renderFnPanel();
   if (name === 'tt') renderTtPanel();
@@ -121,13 +127,13 @@ function addOp() {
     }
     var ratio = parseFloat(document.getElementById('f-ratio').value);
     if (isNaN(ratio) || ratio <= 0) { markField('f-ratio'); return; }
-    ops.push({ id: Date.now(), type: 'split', ticker: ticker, date: date, qty: ratio, price: 0, comm: 0 });
+    // Prima controlla duplicati, poi registra
     var count = applySplit(ticker, ratio, date);
     if (count === -1) {
-      ops.pop(); // annulla il push
       showToast('⚠ Split già applicato per ' + ticker + ' in questa data');
       return;
     }
+    ops.push({ id: Date.now(), type: 'split', ticker: ticker, date: date, qty: ratio, price: 0, comm: 0 });
     save();
     document.getElementById('f-ratio').value = '';
     document.getElementById('f-type').value  = 'buy';
@@ -281,3 +287,38 @@ function exportCSV() {
   var blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='portfolio_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
+
+// ---------- Sorting colonne tabelle ----------
+var sortState = { pf: { col: 'val', dir: 'desc' }, ov: { col: 'val', dir: 'desc' } };
+
+function initSortableHeaders() {
+  var ths = document.querySelectorAll('th.sortable');
+  for (var i = 0; i < ths.length; i++) {
+    (function(th) {
+      th.addEventListener('click', function() {
+        var col   = th.getAttribute('data-sort');
+        var table = th.getAttribute('data-table');
+        var st    = sortState[table];
+        if (st.col === col) {
+          st.dir = st.dir === 'asc' ? 'desc' : 'asc';
+        } else {
+          st.col = col; st.dir = 'desc';
+        }
+        // Update header classes
+        var allThs = document.querySelectorAll('th.sortable[data-table="' + table + '"]');
+        for (var j = 0; j < allThs.length; j++) {
+          allThs[j].classList.remove('sort-asc', 'sort-desc');
+        }
+        th.classList.add(st.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+        // Re-render
+        if (table === 'pf') renderPfPanel();
+        if (table === 'ov') renderOvPanel();
+      });
+    })(ths[i]);
+  }
+}
+
+// Chiamata dopo il DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+  initSortableHeaders();
+});
