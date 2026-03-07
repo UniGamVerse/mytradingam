@@ -431,6 +431,14 @@
 
 </main>
 
+<footer id="app-footer">
+  <div class="footer-inner">
+    <div class="footer-logo">▪ MyTradin<em>GAM</em></div>
+    <div class="footer-claim">Il tuo portafoglio. Chiaro, sempre.</div>
+    <div class="footer-meta">Un'idea di <strong>GAM</strong> · fatto a mano, con cura · <span class="footer-copy">©</span> <span id="footer-year"></span></div>
+  </div>
+</footer>
+
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -454,6 +462,7 @@ document.getElementById('sm-tax').addEventListener('change', function() {
   simulate();
 });
 applyTheme();
+document.getElementById('footer-year').textContent = new Date().getFullYear();
 // renderAll e startLoop vengono chiamati da loadFromFirebase() dopo il login
 </script>
 </body>
