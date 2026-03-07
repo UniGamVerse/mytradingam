@@ -44,6 +44,20 @@ header{border-bottom:1px solid var(--b1);padding:14px 24px;display:flex;align-it
   scrollbar-width: none;}
 .tab{padding:12px 18px;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;transition:all .2s;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif}
 .tab:hover{color:var(--tx)}.tab.active{color:var(--g);border-bottom-color:var(--g)}
+
+/* ── TAB TOOLTIP ── */
+.tab{position:relative}
+.tab::after{
+  content: attr(data-tip);
+  position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--s2);border:1px solid var(--b2);border-radius:5px;
+  padding:5px 10px;font-size:11px;font-weight:500;color:var(--dim);
+  white-space:nowrap;pointer-events:none;
+  opacity:0;transition:opacity .18s;z-index:500;
+  text-transform:none;letter-spacing:0;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+.tab:hover::after{opacity:1}
 .tabs::-webkit-scrollbar{
   display:none;
 }
@@ -227,3 +241,138 @@ tbody td.num{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacin
 .footer-meta{font-size:12px;color:var(--muted)}
 .footer-meta strong{color:var(--dim)}
 .footer-copy{color:var(--g)}
+
+/* ── LOGO ICON ── */
+.logo-icon{font-size:20px;margin-right:2px;line-height:1}
+
+/* ── TAB ACTIONS (Guida + Esci) ── */
+.tab-actions{margin-left:auto;display:flex;align-items:center;gap:6px;padding:0 12px;flex-shrink:0}
+.tab-user{font-size:11px;color:var(--dim);padding:0 6px;white-space:nowrap}
+.tab-user strong{color:var(--tx)}
+.tab-action-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 13px;border-radius:6px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;text-decoration:none;
+  border:1px solid var(--b2);background:var(--s2);color:var(--dim);
+  transition:all .18s;white-space:nowrap;
+}
+.tab-action-btn:hover{border-color:var(--g);color:var(--g)}
+.tab-action-guide{border-color:var(--au);color:var(--au)}
+.tab-action-guide:hover{border-color:var(--au);color:#fff;background:var(--au)}
+.tab-action-exit{border-color:var(--b2);color:var(--dim)}
+.tab-action-exit:hover{border-color:var(--r);color:var(--r)}
+
+/* ── COMPOSIZIONE PATRIMONIO — HTML chart ── */
+.comp-chart-wrap{padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.comp-row{display:grid;grid-template-columns:72px 1fr 100px;gap:12px;align-items:center}
+.comp-label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.comp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.comp-bars{display:flex;flex-direction:column;gap:5px}
+.comp-bar-track{height:10px;background:var(--s2);border-radius:5px;overflow:hidden;position:relative}
+.comp-bar-track-dim{height:6px}
+.comp-bar-fill{height:100%;border-radius:5px;transition:width .6s cubic-bezier(.4,0,.2,1);width:0%}
+.comp-vals{text-align:right}
+.comp-val-main{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--tx)}
+.comp-val-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.comp-pct{font-weight:700;color:var(--dim)}
+.comp-divider{height:1px;background:var(--b1)}
+.comp-legend{display:flex;gap:16px;justify-content:flex-end;margin-top:4px}
+.comp-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.comp-legend-box{width:10px;height:6px;border-radius:2px;display:inline-block}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — MOBILE FIRST
+══════════════════════════════════════════ */
+
+/* Header mobile */
+@media(max-width:768px){
+  header{padding:10px 14px;gap:8px}
+  .logo{font-size:18px}
+  .hstats{gap:0;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
+  .hstats::-webkit-scrollbar{display:none}
+  .hs{text-align:left;flex-shrink:0;padding:0 10px;border-right:1px solid var(--b1)}
+  .hs:last-child{border-right:none}
+  .hs-v{font-size:13px}
+  .hs-l{font-size:9px}
+  .theme-btn{display:none} /* nascosto su mobile, accessibile dal menu */
+}
+
+/* Tabs mobile */
+@media(max-width:768px){
+  .tabs{padding:0 10px;top:52px}
+  .tab{padding:10px 12px;font-size:11px}
+  .tab::after{display:none} /* no tooltip su touch */
+  .tab-actions{padding:0 6px;gap:4px}
+  .tab-user{display:none}
+  .tab-action-btn{padding:4px 9px;font-size:10px}
+}
+
+/* Main padding mobile */
+@media(max-width:768px){
+  main{padding:14px 12px}
+}
+
+/* KPI row mobile */
+@media(max-width:600px){
+  .kpi-row{grid-template-columns:1fr 1fr}
+  .kpi-v{font-size:16px}
+}
+@media(max-width:380px){
+  .kpi-row{grid-template-columns:1fr}
+}
+
+/* Pannello totale: composizione 2 colonne → 1 colonna */
+@media(max-width:700px){
+  .tt-comp-grid{grid-template-columns:1fr !important}
+}
+
+/* Comp chart responsive */
+@media(max-width:480px){
+  .comp-row{grid-template-columns:60px 1fr 80px;gap:8px}
+  .comp-val-main{font-size:11px}
+  .comp-chart-wrap{padding:14px 16px}
+}
+
+/* Overview grid */
+@media(max-width:768px){
+  .ov-grid{grid-template-columns:1fr}
+}
+
+/* Tabelle: scroll orizzontale */
+@media(max-width:768px){
+  .tw{overflow-x:auto}
+  table{min-width:520px}
+  .form-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  .form-grid{grid-template-columns:1fr}
+  table{min-width:440px}
+}
+
+/* Sim grid mobile */
+@media(max-width:768px){
+  .sim-grid{grid-template-columns:1fr}
+}
+
+/* Zainetto mobile */
+@media(max-width:600px){
+  .zn-grid{grid-template-columns:1fr}
+}
+
+/* Alert grid mobile */
+@media(max-width:480px){
+  .alert-grid{grid-template-columns:1fr}
+}
+
+/* Header stats: nascondi alcuni valori su schermi piccoli */
+@media(max-width:480px){
+  .hs-hide-sm{display:none}
+}
+
+/* Footer responsive */
+@media(max-width:480px){
+  #app-footer{padding:20px 16px}
+  .footer-logo{font-size:17px}
+  .footer-meta{font-size:11px}
+}

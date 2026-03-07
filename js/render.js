@@ -122,37 +122,22 @@ function renderTtPanel() {
 }
 
 function drawTtBar(azMkt, fnMkt, azInv, fnInv) {
-  var canvas = document.getElementById('tt-bar'); if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var W = canvas.offsetWidth || 400;
-  canvas.width = W; canvas.height = 160;
-  ctx.clearRect(0, 0, W, 160);
-  var bars   = [
-    { label: 'Valore azioni',  val: azMkt, color: '#00d4a0' },
-    { label: 'Versato azioni', val: azInv, color: 'rgba(0,212,160,.35)' },
-    { label: 'Valore fondi',   val: fnMkt, color: '#4d9fff' },
-    { label: 'Versato fondi',  val: fnInv, color: 'rgba(77,159,255,.35)' }
-  ];
   var maxVal = Math.max(azMkt, fnMkt, azInv, fnInv, 1);
-  var barW   = Math.floor((W - 60) / bars.length) - 10;
-  var maxH   = 110;
-  for (var i = 0; i < bars.length; i++) {
-    var b = bars[i], h = Math.max(2, (b.val / maxVal) * maxH);
-    var x = 30 + i * (barW + 10), y = 120 - h;
-    ctx.fillStyle = b.color;
-    ctx.beginPath();
-    ctx.roundRect ? ctx.roundRect(x, y, barW, h, [3,3,0,0]) : ctx.rect(x, y, barW, h);
-    ctx.fill();
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--dim') || '#5a6a7a';
-    ctx.font = '9px monospace'; ctx.textAlign = 'center';
-    ctx.fillText(b.label.split(' ')[0], x + barW/2, 138);
-    ctx.fillText(b.label.split(' ')[1], x + barW/2, 150);
-    if (b.val > 0) {
-      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--tx') || '#c8d4e0';
-      ctx.font = '8px monospace';
-      ctx.fillText(b.val >= 1000 ? (b.val/1000).toFixed(1)+'k' : b.val.toFixed(0), x + barW/2, y - 4);
-    }
-  }
+  function pct(v) { return Math.max(0, Math.min(100, (v / maxVal) * 100)).toFixed(1) + '%'; }
+
+  var elAzMkt = document.getElementById('cc-az-mkt-bar');
+  var elAzInv = document.getElementById('cc-az-inv-bar');
+  var elFnMkt = document.getElementById('cc-fn-mkt-bar');
+  var elFnInv = document.getElementById('cc-fn-inv-bar');
+  var elAzVal = document.getElementById('cc-az-mkt');
+  var elFnVal = document.getElementById('cc-fn-mkt');
+
+  if (elAzMkt) elAzMkt.style.width = pct(azMkt);
+  if (elAzInv) elAzInv.style.width = pct(azInv);
+  if (elFnMkt) elFnMkt.style.width = pct(fnMkt);
+  if (elFnInv) elFnInv.style.width = pct(fnInv);
+  if (elAzVal) elAzVal.textContent = fe(azMkt);
+  if (elFnVal) elFnVal.textContent = fe(fnMkt);
 }
 
 // ---------- Pannello Overview Azioni ----------
@@ -236,7 +221,8 @@ function drawDonut(pf, totalMkt) {
   ctx.beginPath(); ctx.arc(100,100,50,0,Math.PI*2); ctx.fillStyle = holeFill; ctx.fill();
   var leg = '';
   for (var i = 0; i < items.length; i++) {
-    leg += '<div class="li"><span class="ld" style="background:' + items[i].color + '"></span><span class="lt">' + items[i].ticker + '</span><span>' + fe(items[i].val) + '</span><span class="lp">' + f(items[i].pct,1) + '%</span></div>';
+    var nm = tickerName(items[i].ticker);
+    leg += '<div class="li"><span class="ld" style="background:' + items[i].color + '"></span><span class="lt">' + items[i].ticker + (nm ? '<br><span style="font-size:10px;color:var(--dim);font-weight:400">' + nm + '</span>' : '') + '</span><span>' + fe(items[i].val) + '</span><span class="lp">' + f(items[i].pct,1) + '%</span></div>';
   }
   document.getElementById('donut-leg').innerHTML = leg;
 }

@@ -52,8 +52,8 @@
 
 <header>
   <div class="logo">
-    ▪ MyTradin<em>GAM</em>
-    <button onclick="editTitle()" title="Modifica nome" style="background:none;border:none;cursor:pointer;color:var(--dim);font-size:13px;padding:2px 6px;border-radius:4px;transition:color .2s" onmouseover="this.style.color='var(--g)'" onmouseout="this.style.color='var(--dim)'">✎</button>
+    <span class="logo-icon">&#x1F4C8;</span>MyTradin<em>GAM</em>
+    <button onclick="editTitle()" data-tip="Modifica nome" style="background:none;border:none;cursor:pointer;color:var(--dim);font-size:13px;padding:2px 6px;border-radius:4px;transition:color .2s" onmouseover="this.style.color='var(--g)'" onmouseout="this.style.color='var(--dim)'">✎</button>
     <span style="margin-left:10px;border-left:1px solid var(--b2);padding-left:14px;display:flex;flex-direction:column;gap:3px">
       <div style="display:flex;align-items:center;gap:6px">
         <span class="dot" id="ldot"></span>
@@ -65,35 +65,33 @@
   <div class="hstats">
     <div class="hs"><div class="hs-l">Patrimonio totale</div><div class="hs-v pos" id="h-tot">€ 0,00</div></div>
     <div class="hs"><div class="hs-l">Azioni</div><div class="hs-v" id="h-mkt">€ 0,00</div></div>
-    <div class="hs"><div class="hs-l">Fondi</div><div class="hs-v" id="h-fn">€ 0,00</div></div>
+    <div class="hs hs-hide-sm"><div class="hs-l">Fondi</div><div class="hs-v" id="h-fn">€ 0,00</div></div>
     <div class="hs"><div class="hs-l">P&amp;L Latente</div><div class="hs-v" id="h-unr">€ 0,00</div></div>
-    <div class="hs"><div class="hs-l">P&amp;L Realizzato</div><div class="hs-v neu" id="h-rel">€ 0,00</div></div>
+    <div class="hs hs-hide-sm"><div class="hs-l">P&amp;L Realizzato</div><div class="hs-v neu" id="h-rel">€ 0,00</div></div>
     <div class="hs" style="display:flex;gap:7px;align-items:center">
-      <button class="btn btn-g btn-sm" onclick="exportJSON()" title="Esporta backup JSON">↓ Salva</button>
-      <button class="btn btn-n btn-sm" onclick="openImport()" title="Importa JSON">↑ Importa</button>
+      <button class="btn btn-g btn-sm" onclick="exportJSON()" data-tip="Esporta backup JSON">↓ Salva</button>
+      <button class="btn btn-n btn-sm" onclick="openImport()" data-tip="Importa JSON">↑ Importa</button>
     </div>
     <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">☀ Light</button>
   </div>
 </header>
 
 <div class="tabs">
-  <button class="tab active" onclick="goTab('tt')">◉ Totale</button>
-  <button class="tab" onclick="goTab('ov')">▣ Azioni</button>
-  <button class="tab" onclick="goTab('op')">+ Operazione</button>
-  <button class="tab" onclick="goTab('lg')">Log</button>
-  <button class="tab" onclick="goTab('pf')">Portafoglio</button>
-  <button class="tab" onclick="goTab('sm')">Simulatore CG</button>
-  <button class="tab" onclick="goTab('zn')">Zainetto Fiscale</button>
-  <button class="tab" onclick="goTab('al')">Alert Prezzi</button>
-  <button class="tab" onclick="goTab('fn')">◈ Fondi</button>
-  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;padding:0 16px">
-    <span id="user-info" style="display:none;align-items:center;gap:8px">
-      <button class="theme-btn" style="font-size:11px;color:var(--dim);cursor:default;pointer-events:none">
-        trading di <strong id="user-name" style="color:var(--tx)">—</strong>
-      </button>
-      <button onclick="signOut()" class="theme-btn" style="color:var(--r);border-color:var(--r);font-size:11px">✕ Esci</button>
+  <button class="tab active" onclick="goTab('tt')" data-tip="Patrimonio complessivo: azioni + fondi, P&L e CAGR totale">◉ Totale</button>
+  <button class="tab" onclick="goTab('ov')" data-tip="Portafoglio azionario: grafico allocazione e riepilogo posizioni">▣ Azioni</button>
+  <button class="tab" onclick="goTab('op')" data-tip="Registra acquisti, vendite, split e raggruppamenti">+ Operazione</button>
+  <button class="tab" onclick="goTab('lg')" data-tip="Storico completo di tutte le operazioni · esporta CSV">Log</button>
+  <button class="tab" onclick="goTab('pf')" data-tip="Dettaglio posizioni con prezzi live · aggiornamento ogni 60s">Portafoglio</button>
+  <button class="tab" onclick="goTab('sm')" data-tip="Simula una vendita e calcola il capital gain al 26%">Simulatore CG</button>
+  <button class="tab" onclick="goTab('zn')" data-tip="Minusvalenze compensabili entro 4 anni dall'anno di realizzo">Zainetto Fiscale</button>
+  <button class="tab" onclick="goTab('al')" data-tip="Imposta target e stop loss · notifiche quando il prezzo li raggiunge">Alert Prezzi</button>
+  <button class="tab" onclick="goTab('fn')" data-tip="Gestione fondi comuni OICR: quote, NAV, CAGR e movimenti">◈ Fondi</button>
+  <div class="tab-actions">
+    <span id="user-info" style="display:none;align-items:center;gap:6px">
+      <span class="tab-user">trading di <strong id="user-name">—</strong></span>
+      <button onclick="signOut()" class="tab-action-btn tab-action-exit">✕ Esci</button>
     </span>
-    <a href="guida.html" target="_blank" class="btn btn-sm" style="border:1px solid var(--au);color:var(--au);background:transparent;text-decoration:none;padding:5px 12px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase">? Guida</a>
+    <a href="guida.html" target="_blank" class="tab-action-btn tab-action-guide">? Guida</a>
   </div>
 </div>
 
@@ -108,14 +106,45 @@
     <div class="kpi ca"><div class="kpi-l">P&amp;L Realizzato totale</div><div class="kpi-v" id="tt-rel">€ 0,00</div><div class="kpi-s" id="tt-rel-s">Comm: —</div></div>
     <div class="kpi cd"><div class="kpi-l">CAGR totale</div><div class="kpi-v" id="tt-cagr" style="color:var(--tx)">—</div><div class="kpi-s" id="tt-cagr-s">rend. annuo composto</div></div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+  <div class="tt-comp-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
     <div class="tw" style="margin-bottom:0">
       <div class="th"><strong>Composizione patrimonio</strong><span>azioni vs fondi</span></div>
-      <div style="padding:20px 24px">
-        <canvas id="tt-bar" height="160"></canvas>
-        <div style="display:flex;gap:20px;justify-content:center;margin-top:14px;font-size:12px">
-          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--g);margin-right:5px;vertical-align:middle"></span>Azioni <strong id="tt-bar-az-pct">0%</strong></span>
-          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--bl);margin-right:5px;vertical-align:middle"></span>Fondi <strong id="tt-bar-fn-pct">0%</strong></span>
+      <div class="comp-chart-wrap">
+        <!-- Barre orizzontali comparate -->
+        <div class="comp-row">
+          <div class="comp-label"><span class="comp-dot" style="background:var(--g)"></span>Azioni</div>
+          <div class="comp-bars">
+            <div class="comp-bar-track">
+              <div class="comp-bar-fill" id="cc-az-mkt-bar" style="background:var(--g)"></div>
+            </div>
+            <div class="comp-bar-track comp-bar-track-dim">
+              <div class="comp-bar-fill" id="cc-az-inv-bar" style="background:rgba(0,212,160,.35)"></div>
+            </div>
+          </div>
+          <div class="comp-vals">
+            <div class="comp-val-main" id="cc-az-mkt">€ —</div>
+            <div class="comp-val-sub">Valore <span id="tt-bar-az-pct" class="comp-pct">0%</span></div>
+          </div>
+        </div>
+        <div class="comp-divider"></div>
+        <div class="comp-row">
+          <div class="comp-label"><span class="comp-dot" style="background:var(--bl)"></span>Fondi</div>
+          <div class="comp-bars">
+            <div class="comp-bar-track">
+              <div class="comp-bar-fill" id="cc-fn-mkt-bar" style="background:var(--bl)"></div>
+            </div>
+            <div class="comp-bar-track comp-bar-track-dim">
+              <div class="comp-bar-fill" id="cc-fn-inv-bar" style="background:rgba(77,159,255,.35)"></div>
+            </div>
+          </div>
+          <div class="comp-vals">
+            <div class="comp-val-main" id="cc-fn-mkt">€ —</div>
+            <div class="comp-val-sub">Valore <span id="tt-bar-fn-pct" class="comp-pct">0%</span></div>
+          </div>
+        </div>
+        <div class="comp-legend">
+          <span class="comp-legend-item"><span class="comp-legend-box" style="opacity:1;background:var(--g)"></span>Valore attuale</span>
+          <span class="comp-legend-item"><span class="comp-legend-box" style="opacity:.4;background:var(--g)"></span>Versato</span>
         </div>
       </div>
     </div>
@@ -434,8 +463,7 @@
 <footer id="app-footer">
   <div class="footer-inner">
     <div class="footer-logo">▪ MyTradin<em>GAM</em></div>
-    <div class="footer-claim">Il tuo portafoglio. Chiaro, sempre.</div>
-    <div class="footer-meta">Un'idea di <strong>GAM</strong> · fatto a mano, con cura · <span class="footer-copy">©</span> <span id="footer-year"></span></div>
+    <div class="footer-meta">Fatto per chi i numeri li prende sul serio · <span class="footer-copy">©</span> <span id="footer-year"></span></div>
   </div>
 </footer>
 

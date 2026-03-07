@@ -77,6 +77,13 @@ function grandTotals() {
 
 // ---------- SPLIT / RAGGRUPPAMENTO ----------
 function applySplit(ticker, ratio, date) {
+  // Guardia anti-doppio-split: verifica se esiste già uno split identico
+  for (var j = 0; j < ops.length; j++) {
+    var s = ops[j];
+    if (s.type === 'split' && s.ticker === ticker && s.date === date && s.qty === ratio) {
+      return -1; // segnala duplicato al chiamante
+    }
+  }
   var count = 0;
   for (var i = 0; i < ops.length; i++) {
     var op = ops[i];

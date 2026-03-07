@@ -123,6 +123,11 @@ function addOp() {
     if (isNaN(ratio) || ratio <= 0) { markField('f-ratio'); return; }
     ops.push({ id: Date.now(), type: 'split', ticker: ticker, date: date, qty: ratio, price: 0, comm: 0 });
     var count = applySplit(ticker, ratio, date);
+    if (count === -1) {
+      ops.pop(); // annulla il push
+      showToast('⚠ Split già applicato per ' + ticker + ' in questa data');
+      return;
+    }
     save();
     document.getElementById('f-ratio').value = '';
     document.getElementById('f-type').value  = 'buy';
@@ -169,9 +174,12 @@ function addOp() {
 
 function delOp(id)  { ops = ops.filter(function(o){ return o.id !== id; }); save(); renderAll(); }
 function clearAll() {
-  if (!confirm('Eliminare tutte le operazioni?')) return;
-  ops = []; prices = {}; curPrices = {}; alertLog = [];
-  save(); renderAll();
+  if (!confirm('Eliminare TUTTO il portafoglio?\n\nVerranno cancellate operazioni, fondi, alert e storico prezzi.\nQuesta operazione non è reversibile.')) return;
+  ops = []; prices = {}; curPrices = {}; alertLog = []; alerts = {};
+  fondi = []; fnMovs = []; fnNavs = {};
+  save(); saveFondi();
+  renderAll();
+  showToast('Portafoglio azzerato ✓');
 }
 
 // ---------- Simulatore Capital Gain ----------
