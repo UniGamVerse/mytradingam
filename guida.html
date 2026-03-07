@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guida · MyTradinGAM</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Instrument+Serif&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:#3a5268; --s1:#2e4257; --s2:#253749;
@@ -16,7 +16,8 @@
   --bl:#7aadcc; --bld:rgba(122,173,204,.18);
   --ac:#7aadcc;
   --mono:'JetBrains Mono','Courier New',monospace;
-  --serif:'Instrument Serif',serif;
+  --sidebar-w: 240px;
+  --header-h: 56px;
 }
 [data-theme="light"] {
   --bg:#f0f4f8; --s1:#ffffff; --s2:#e8eef4;
@@ -27,397 +28,632 @@
   --ac:#3a6285;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--tx);font-family:'Inter',system-ui,sans-serif;font-size:16px;line-height:1.6;min-height:100vh;transition:background .25s,color .25s}
+body{background:var(--bg);color:var(--tx);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.65;min-height:100vh;transition:background .25s,color .25s}
 
-header{border-bottom:1px solid var(--b1);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);backdrop-filter:blur(10px);z-index:100}
-.logo{font-family:'Inter',sans-serif;font-size:24px;color:var(--tx);display:flex;align-items:center;gap:8px}
+/* ── HEADER ── */
+header{
+  height:var(--header-h);border-bottom:1px solid var(--b1);
+  padding:0 20px;display:flex;align-items:center;justify-content:space-between;
+  position:fixed;top:0;left:0;right:0;background:var(--bg);z-index:200;
+}
+.logo{font-family:'Inter',sans-serif;font-size:20px;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:6px}
 .logo em{color:var(--g);font-style:normal}
-.logo-sub{font-size:14px;color:var(--dim);font-family:'Inter',sans-serif;font-weight:400;margin-left:4px}
-.theme-btn{background:var(--s2);border:1px solid var(--b2);border-radius:20px;padding:6px 16px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--dim);transition:all .2s;display:flex;align-items:center;gap:6px}
-.theme-btn:hover{border-color:var(--g);color:var(--g)}
-.back-btn{background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:7px 16px;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--dim);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
-.back-btn:hover{border-color:var(--g);color:var(--g)}
+.logo-tag{font-size:12px;color:var(--muted);font-weight:400;margin-left:6px;padding:2px 8px;border:1px solid var(--b2);border-radius:12px}
+.hdr-btns{display:flex;gap:8px;align-items:center}
+.btn-sm{background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:6px 14px;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--dim);text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:all .2s;white-space:nowrap}
+.btn-sm:hover{border-color:var(--g);color:var(--g)}
 
-main{padding:32px 24px;max-width:900px;margin:0 auto}
+/* ── LAYOUT ── */
+.layout{display:flex;margin-top:var(--header-h);min-height:calc(100vh - var(--header-h))}
 
-.gu-wrap{max-width:840px;margin:0 auto}
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  position:fixed;top:var(--header-h);left:0;bottom:0;
+  background:var(--s1);border-right:1px solid var(--b1);
+  overflow-y:auto;padding:20px 0;z-index:100;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 
-.gu-hero{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:40px 40px;margin-bottom:24px;text-align:center}
-.gu-hero h1{font-family:'Inter',sans-serif;font-size:36px;color:var(--tx);font-weight:400;margin-bottom:12px;line-height:1.2}
-.gu-hero p{color:var(--dim);font-size:16px;line-height:1.75;max-width:580px;margin:0 auto}
+.nav-section-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--muted);padding:14px 18px 6px;
+}
+.nav-link{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 18px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--dim);
+  text-decoration:none;border-left:2px solid transparent;
+  transition:all .18s;line-height:1.3;
+}
+.nav-link:hover{color:var(--tx);background:var(--s2)}
+.nav-link.active{color:var(--g);border-left-color:var(--g);background:var(--gd)}
+.nav-icon{font-size:15px;flex-shrink:0;width:20px;text-align:center}
 
-.gu-section{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:28px 32px;margin-bottom:16px}
-.gu-section h2{font-family:'Inter',sans-serif;font-size:17px;font-weight:700;color:var(--tx);margin-bottom:20px;display:flex;align-items:center;gap:10px;text-transform:uppercase;letter-spacing:.04em;padding-bottom:12px;border-bottom:1px solid var(--b1)}
-.gu-section h2 .gu-icon{font-size:20px}
+/* ── MAIN CONTENT ── */
+main{margin-left:var(--sidebar-w);flex:1;padding:32px 40px 80px;max-width:calc(860px + var(--sidebar-w));min-width:0}
 
-.gu-step{display:flex;gap:16px;margin-bottom:18px;align-items:flex-start}
+/* ── HERO ── */
+.gu-hero{
+  background:linear-gradient(135deg,var(--s1) 0%,var(--s2) 100%);
+  border:1px solid var(--b1);border-radius:12px;
+  padding:36px 40px;margin-bottom:28px;
+}
+.gu-hero h1{font-size:28px;font-weight:700;color:var(--tx);margin-bottom:10px;line-height:1.25}
+.gu-hero p{color:var(--dim);font-size:14px;line-height:1.75;max-width:540px}
+.gu-hero-meta{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.gu-badge{display:inline-flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--b2);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;color:var(--dim)}
+.gu-badge.g{background:var(--gd);border-color:rgba(0,212,160,.35);color:var(--g)}
+
+/* ── ACCORDION SECTION ── */
+.gu-section{
+  background:var(--s1);border:1px solid var(--b1);border-radius:10px;
+  margin-bottom:10px;overflow:hidden;
+  transition:border-color .2s;
+  scroll-margin-top:calc(var(--header-h) + 20px);
+}
+.gu-section:hover{border-color:var(--b2)}
+.gu-section.open{border-color:var(--bl)}
+
+.gu-section-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 24px;cursor:pointer;gap:12px;
+  user-select:none;
+}
+.gu-section-header:hover .gu-section-title{color:var(--tx)}
+.gu-section-left{display:flex;align-items:center;gap:12px;min-width:0}
+.gu-section-icon{font-size:18px;flex-shrink:0;width:26px;text-align:center}
+.gu-section-title{
+  font-size:14px;font-weight:700;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.045em;
+  transition:color .18s;
+}
+.gu-section.open .gu-section-title{color:var(--tx)}
+.gu-chevron{
+  flex-shrink:0;width:22px;height:22px;border-radius:50%;
+  background:var(--s2);border:1px solid var(--b2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--muted);
+  transition:transform .25s,background .2s,color .2s;
+}
+.gu-section.open .gu-chevron{transform:rotate(180deg);background:var(--gd);border-color:rgba(0,212,160,.3);color:var(--g)}
+
+.gu-section-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .35s cubic-bezier(.4,0,.2,1);
+}
+.gu-section.open .gu-section-body{max-height:4000px}
+.gu-section-inner{padding:0 24px 24px}
+
+/* ── STEPS ── */
+.gu-step{display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}
 .gu-step:last-child{margin-bottom:0}
-.gu-num{width:30px;height:30px;border-radius:50%;background:var(--g);color:#000;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.gu-num{width:28px;height:28px;border-radius:50%;background:var(--g);color:#000;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
 .gu-num.q{background:var(--au)}
-.gu-step-body{flex:1}
-.gu-step-title{font-weight:700;color:var(--tx);margin-bottom:5px;font-size:15px}
-.gu-step-desc{color:var(--dim);font-size:14px;line-height:1.7}
+.gu-num.r{background:var(--r)}
+.gu-step-body{flex:1;min-width:0}
+.gu-step-title{font-weight:700;color:var(--tx);margin-bottom:4px;font-size:14px}
+.gu-step-desc{color:var(--dim);font-size:13px;line-height:1.72}
 .gu-step-desc strong{color:var(--tx)}
-.gu-step-desc br{margin-bottom:4px}
 
-.gu-pill{display:inline-block;background:var(--s2);border:1px solid var(--b2);border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;color:var(--tx);margin:0 2px;font-family:var(--mono)}
+/* ── PILLS ── */
+.gu-pill{display:inline-block;background:var(--s2);border:1px solid var(--b2);border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700;color:var(--tx);margin:0 2px;font-family:var(--mono)}
 .gu-pill.g{background:var(--gd);border-color:rgba(0,212,160,.4);color:var(--g)}
 .gu-pill.r{background:var(--rd);border-color:rgba(255,77,106,.4);color:var(--r)}
 .gu-pill.a{background:var(--aud);border-color:rgba(240,180,41,.4);color:var(--au)}
 
-.gu-glossary{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:600px){.gu-glossary{grid-template-columns:1fr}}
-.gu-term{background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:14px 16px}
-.gu-term-name{font-weight:700;color:var(--g);font-size:13px;margin-bottom:5px}
-.gu-term-def{color:var(--dim);font-size:13px;line-height:1.6}
-
-.gu-tip{background:var(--aud);border:1px solid rgba(240,180,41,.3);border-radius:6px;padding:14px 18px;font-size:14px;color:var(--dim);line-height:1.7;margin-top:18px}
+/* ── TIP / WARNING BOX ── */
+.gu-tip{background:var(--aud);border:1px solid rgba(240,180,41,.3);border-radius:7px;padding:13px 16px;font-size:13px;color:var(--dim);line-height:1.7;margin-top:18px}
 .gu-tip strong{color:var(--au)}
+.gu-warn{background:var(--rd);border:1px solid rgba(255,77,106,.3);border-radius:7px;padding:13px 16px;font-size:13px;color:var(--dim);line-height:1.7;margin-top:18px}
+.gu-warn strong{color:var(--r)}
 
-.gu-new{display:inline-block;background:var(--gd);border:1px solid rgba(0,212,160,.3);border-radius:3px;padding:1px 7px;font-size:10px;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.06em;margin-left:8px;vertical-align:middle}
+/* ── GLOSSARY ── */
+.gu-glossary{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.gu-glossary{grid-template-columns:1fr}}
+.gu-term{background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:12px 14px}
+.gu-term-name{font-weight:700;color:var(--g);font-size:12px;margin-bottom:4px}
+.gu-term-def{color:var(--dim);font-size:12px;line-height:1.6}
 
-.gu-ticker-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
-.gu-ticker-table th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:7px 12px;border-bottom:1px solid var(--b1)}
-.gu-ticker-table td{padding:8px 12px;border-bottom:1px solid var(--b1);color:var(--dim)}
-.gu-ticker-table td:first-child{font-family:var(--mono);font-weight:700;color:var(--tx)}
+/* ── TICKER TABLE ── */
+.gu-ticker-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
+.gu-ticker-table th{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:6px 10px;border-bottom:1px solid var(--b1)}
+.gu-ticker-table td{padding:7px 10px;border-bottom:1px solid var(--b1);color:var(--dim)}
+.gu-ticker-table td:first-child,.gu-ticker-table td:nth-child(3){font-family:var(--mono);font-weight:700;color:var(--tx)}
 .gu-ticker-table tr:last-child td{border-bottom:none}
+
+/* ── DIVIDER ── */
+.gu-divider{height:1px;background:var(--b1);margin:18px 0}
+
+/* ── MOBILE TOGGLE ── */
+.sidebar-toggle{display:none;background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:16px;color:var(--dim)}
+
+@media(max-width:820px){
+  :root{--sidebar-w:0px}
+  .sidebar{transform:translateX(-240px);width:240px;transition:transform .25s;box-shadow:none}
+  .sidebar.open{transform:translateX(0);box-shadow:4px 0 24px rgba(0,0,0,.3)}
+  main{margin-left:0;padding:24px 20px 60px}
+  .sidebar-toggle{display:flex}
+  .gu-hero{padding:24px 22px}
+  .gu-hero h1{font-size:22px}
+  .gu-section-inner{padding:0 16px 20px}
+  .gu-section-header{padding:14px 16px}
+}
+
+/* ── OVERLAY ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
+.overlay.show{display:block}
+
+/* ── SCROLL PROGRESS ── */
+.progress-bar{position:fixed;top:var(--header-h);left:0;height:2px;background:var(--g);z-index:300;transition:width .1s linear;width:0%}
 </style>
 </head>
 <body>
 
+<div class="progress-bar" id="progress"></div>
+
 <header>
-<div class="logo">▪ MyTradin<em>GAM</em><span style="font-size:13px;color:var(--dim);font-family:'Inter',sans-serif;font-weight:400;margin-left:6px">— Guida</span></div>
-  <div style="display:flex;gap:10px;align-items:center">
-    <a class="back-btn" href="index.html">← Torna all'app</a>
-    <button class="theme-btn" onclick="toggleTheme()" id="theme-btn">☀ Light</button>
+  <div class="logo">▪ MyTradin<em>GAM</em><span class="logo-tag">Guida</span></div>
+  <div class="hdr-btns">
+    <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    <a class="btn-sm" href="index.html">← App</a>
+    <button class="btn-sm" onclick="toggleTheme()" id="theme-btn">☀ Light</button>
   </div>
 </header>
 
-<main>
-<div class="gu-wrap">
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-  <div class="gu-hero">
-    <h1>▪ Guida a MyTradin<em style="color:var(--g);font-style:normal">GAM</em></h1>
-    <p>La tua app personale per tenere traccia del portafoglio, calcolare guadagni e tasse, e monitorare i prezzi in tempo reale. Segui questa guida per usarla al meglio.</p>
-  </div>
+<div class="layout">
 
-  <!-- SEZIONE 1 -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">🧠</span> Le basi: azioni, ticker e commissioni</h2>
-    <div class="gu-step">
-      <div class="gu-num">1</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Un'azione = un pezzo di un'azienda</div>
-        <div class="gu-step-desc">Quando compri un'azione di <strong>ENI</strong> o <strong>Ferrari</strong>, stai comprando una piccola fetta di quell'azienda. Se l'azienda cresce, il prezzo della tua fetta sale. Se va male, scende. Il valore oscilla ogni giorno in base a domanda e offerta sul mercato.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">2</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Il ticker: il codice dell'azione</div>
-        <div class="gu-step-desc">Ogni azione ha un codice breve chiamato <strong>ticker</strong>. In questa app i ticker usano il formato <strong>BIT:NOMESIMBOLO</strong> per le azioni italiane (es. <span class="gu-pill">BIT:ENI</span>, <span class="gu-pill">BIT:RACE</span>, <span class="gu-pill">BIT:STMMI</span>). Il prefisso BIT indica la Borsa Italiana. Nei campi dell'app devi sempre usare il ticker esatto — se un titolo non è nel foglio prezzi, <strong>chiedi a GAM di aggiungerlo</strong>.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">3</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">La commissione: il costo dell'operazione</div>
-        <div class="gu-step-desc">Ogni acquisto o vendita ha un costo fisso addebitato dalla banca o dal broker: la <strong>commissione</strong>. Anche pochi euro incidono, soprattutto su operazioni piccole. Inseriscila sempre — l'app la considera in tutti i calcoli di P&amp;L e tasse.</div>
-      </div>
-    </div>
-    <div class="gu-tip">💡 <strong>Ticker principali Borsa Italiana:</strong>
-      <table class="gu-ticker-table" style="margin-top:10px">
-        <tr><th>Ticker</th><th>Società</th><th>Ticker</th><th>Società</th></tr>
-        <tr><td>BIT:ENI</td><td>ENI</td><td>BIT:RACE</td><td>Ferrari</td></tr>
-        <tr><td>BIT:ENEL</td><td>ENEL</td><td>BIT:STMMI</td><td>STMicroelectronics</td></tr>
-        <tr><td>BIT:ISP</td><td>Intesa Sanpaolo</td><td>BIT:STLAM</td><td>Stellantis</td></tr>
-        <tr><td>BIT:UCG</td><td>UniCredit</td><td>BIT:NEXI</td><td>Nexi</td></tr>
-        <tr><td>BIT:G</td><td>Generali</td><td>BIT:LDO</td><td>Leonardo</td></tr>
-      </table>
-    </div>
-  </div>
+  <!-- SIDEBAR NAV -->
+  <nav class="sidebar" id="sidebar">
+    <div class="nav-section-label">Contenuti</div>
+    <a class="nav-link" href="#sec0" onclick="navClick(this)"><span class="nav-icon">🧠</span>Le basi</a>
+    <a class="nav-link" href="#sec1" onclick="navClick(this)"><span class="nav-icon">➕</span>Registrare un acquisto</a>
+    <a class="nav-link" href="#sec2" onclick="navClick(this)"><span class="nav-icon">▣</span>Le tab dell'app</a>
+    <a class="nav-link" href="#sec3" onclick="navClick(this)"><span class="nav-icon">💰</span>PMC e FIFO</a>
+    <a class="nav-link" href="#sec4" onclick="navClick(this)"><span class="nav-icon">🧾</span>Tasse e zainetto</a>
+    <a class="nav-link" href="#sec5" onclick="navClick(this)"><span class="nav-icon">🔔</span>Alert prezzi</a>
+    <a class="nav-link" href="#sec6" onclick="navClick(this)"><span class="nav-icon">◈</span>Fondi comuni</a>
+    <a class="nav-link" href="#sec7" onclick="navClick(this)"><span class="nav-icon">☁️</span>Dati e sicurezza</a>
+    <div class="nav-section-label" style="margin-top:8px">Riferimento</div>
+    <a class="nav-link" href="#sec8" onclick="navClick(this)"><span class="nav-icon">📖</span>Glossario</a>
+    <a class="nav-link" href="#sec9" onclick="navClick(this)"><span class="nav-icon">❓</span>FAQ</a>
+  </nav>
 
-  <!-- SEZIONE 2 -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">➕</span> Come registrare un acquisto</h2>
-    <div class="gu-step">
-      <div class="gu-num">1</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Vai sulla tab <span class="gu-pill">+ Operazione</span></div>
-        <div class="gu-step-desc">Clicca il tab in alto. Trovi un modulo con sei campi da compilare.</div>
+  <!-- MAIN -->
+  <main id="main-content">
+
+    <div class="gu-hero">
+      <h1>▪ Guida a MyTradin<em style="color:var(--g);font-style:normal">GAM</em></h1>
+      <p>La tua app per tenere traccia del portafoglio, calcolare guadagni e tasse, e monitorare i prezzi. Clicca una sezione per espanderla.</p>
+      <div class="gu-hero-meta">
+        <span class="gu-badge g">✓ Firebase sync</span>
+        <span class="gu-badge">FIFO · PMC · CAGR</span>
+        <span class="gu-badge">26% Capital Gain</span>
       </div>
     </div>
-    <div class="gu-step">
-      <div class="gu-num">2</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Compila i campi</div>
-        <div class="gu-step-desc">
-          <strong>Tipo:</strong> scegli ACQUISTO.<br>
-          <strong>Ticker:</strong> il codice del titolo (es. <span class="gu-pill">BIT:ENI</span>). Deve corrispondere esattamente a quello nel foglio prezzi.<br>
-          <strong>Data:</strong> la data in cui hai comprato, anche anni fa.<br>
-          <strong>Quantità:</strong> quante azioni (es. 100).<br>
-          <strong>Prezzo €/az.:</strong> quanto hai pagato per ogni singola azione.<br>
-          <strong>Commissioni €:</strong> il costo dell'operazione addebitato dal broker.
+
+    <!-- SEZIONE 0 — LE BASI -->
+    <div class="gu-section open" id="sec0">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">🧠</span>
+          <span class="gu-section-title">Le basi: azioni, ticker e commissioni</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-step">
+            <div class="gu-num">1</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Un'azione = un pezzo di un'azienda</div>
+              <div class="gu-step-desc">Comprare un'azione di <strong>ENI</strong> o <strong>Ferrari</strong> significa acquisire una piccola quota di quell'azienda. Se l'azienda cresce, il valore della quota sale; se va male, scende. Il prezzo oscilla ogni giorno in base alla domanda e all'offerta sul mercato.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">2</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Il ticker: il codice dell'azione</div>
+              <div class="gu-step-desc">Ogni azione ha un codice breve chiamato <strong>ticker</strong>. In questa app i ticker usano il formato <strong>BIT:SIMBOLO</strong> per le azioni italiane (es. <span class="gu-pill">BIT:ENI</span>, <span class="gu-pill">BIT:RACE</span>, <span class="gu-pill">BIT:STMMI</span>). Il prefisso <strong>BIT</strong> indica la Borsa Italiana. Nei campi dell'app devi sempre usare il ticker esatto — se un titolo non è nel foglio prezzi, <strong>chiedi a GAM di aggiungerlo</strong>.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">3</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">La commissione: il costo dell'operazione</div>
+              <div class="gu-step-desc">Ogni acquisto o vendita ha un costo fisso addebitato dalla banca o dal broker: la <strong>commissione</strong>. Anche pochi euro incidono, soprattutto su operazioni di importo ridotto. Inseriscila sempre — l'app la considera in tutti i calcoli di P&amp;L e tasse.</div>
+            </div>
+          </div>
+          <div class="gu-tip">💡 <strong>Ticker principali Borsa Italiana:</strong>
+            <table class="gu-ticker-table">
+              <tr><th>Ticker</th><th>Società</th><th>Ticker</th><th>Società</th></tr>
+              <tr><td>BIT:ENI</td><td>ENI</td><td>BIT:RACE</td><td>Ferrari</td></tr>
+              <tr><td>BIT:ENEL</td><td>ENEL</td><td>BIT:STMMI</td><td>STMicroelectronics</td></tr>
+              <tr><td>BIT:ISP</td><td>Intesa Sanpaolo</td><td>BIT:STLAM</td><td>Stellantis</td></tr>
+              <tr><td>BIT:UCG</td><td>UniCredit</td><td>BIT:NEXI</td><td>Nexi</td></tr>
+              <tr><td>BIT:G</td><td>Generali</td><td>BIT:LDO</td><td>Leonardo</td></tr>
+            </table>
+          </div>
         </div>
       </div>
     </div>
-    <div class="gu-step">
-      <div class="gu-num">3</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Clicca <span class="gu-pill g">▶ Registra</span> e ripeti per ogni acquisto</div>
-        <div class="gu-step-desc">Se hai comprato le stesse azioni in momenti diversi — es. 100 nel 2020 e altre 50 nel 2023 — registra ogni acquisto separatamente. Il PMC e il CAGR saranno automaticamente corretti.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">4</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Il titolo non è nel foglio prezzi?</div>
-        <div class="gu-step-desc">Se compare il messaggio <span class="gu-pill a">⚠ non nel foglio prezzi</span>, il prezzo non si aggiornerà in automatico. Puoi comunque registrare l'operazione e inserire il prezzo manualmente nella tab Portafoglio. Per averlo aggiornato in tempo reale, <strong>chiedi a GAM di aggiungere il ticker al foglio prezzi</strong>.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">5</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Il titolo ha subito uno split o un raggruppamento?</div>
-        <div class="gu-step-desc">Se un'azione ha subito un frazionamento (es. NVIDIA 10:1 nel 2024) o un raggruppamento, devi registrarlo prima di inserire operazioni post-split. Seleziona tipo <span class="gu-pill a">⇄ SPLIT / RAGGRUPPAMENTO</span>, inserisci il ticker, la data dello split e il rapporto. L'app ricalcola automaticamente quantità e prezzi di tutti gli acquisti precedenti — il P&amp;L rimane corretto.</div>
-      </div>
-    </div>
-    <div class="gu-tip">💡 <strong>Consiglio:</strong> inserisci gli acquisti in ordine cronologico, dal più vecchio al più recente. Eviti confusione e il calcolo FIFO sarà sempre corretto.</div>
-  </div>
 
-  <!-- SEZIONE 3 -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">▣</span> Cosa vedi nelle varie tab</h2>
-    <div class="gu-step">
-      <div class="gu-num">1</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">◉ Totale — il quadro completo</div>
-        <div class="gu-step-desc">Mostra il patrimonio complessivo sommando azioni e fondi. Trovi il P&amp;L latente (sulla carta), il P&amp;L realizzato (incassato), e il CAGR totale ponderato. La barra di composizione divide il peso tra azioni e fondi.</div>
+    <!-- SEZIONE 1 — ACQUISTO -->
+    <div class="gu-section" id="sec1">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">➕</span>
+          <span class="gu-section-title">Come registrare un acquisto</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-step">
+            <div class="gu-num">1</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Vai sulla tab <span class="gu-pill">+ Operazione</span></div>
+              <div class="gu-step-desc">Clicca il tab in alto. Trovi un modulo con sei campi da compilare.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">2</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Compila i campi</div>
+              <div class="gu-step-desc">
+                <strong>Tipo:</strong> scegli ACQUISTO.<br>
+                <strong>Ticker:</strong> il codice del titolo (es. <span class="gu-pill">BIT:ENI</span>), esattamente come nel foglio prezzi.<br>
+                <strong>Data:</strong> la data in cui hai comprato, anche anni fa.<br>
+                <strong>Quantità:</strong> il numero di azioni (es. 100).<br>
+                <strong>Prezzo €/az.:</strong> quanto hai pagato per ogni singola azione.<br>
+                <strong>Commissioni €:</strong> il costo dell'operazione addebitato dal broker.
+              </div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">3</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Clicca <span class="gu-pill g">▶ Registra</span> e ripeti per ogni acquisto</div>
+              <div class="gu-step-desc">Se hai comprato le stesse azioni in momenti diversi — es. 100 nel 2020 e altre 50 nel 2023 — registra ogni acquisto separatamente. PMC e CAGR saranno automaticamente corretti.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">4</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Il titolo non è nel foglio prezzi?</div>
+              <div class="gu-step-desc">Se compare il messaggio <span class="gu-pill a">⚠ non nel foglio prezzi</span>, il prezzo non si aggiornerà in automatico. Puoi comunque registrare l'operazione e inserire il prezzo manualmente nella tab Portafoglio. Per averlo in tempo reale, <strong>chiedi a GAM di aggiungere il ticker</strong>.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">5</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Il titolo ha subito uno split?</div>
+              <div class="gu-step-desc">Se un'azione ha subito un frazionamento (es. NVIDIA 10:1 nel 2024) o un raggruppamento, devi registrarlo <strong>prima</strong> di inserire operazioni successive. Seleziona tipo <span class="gu-pill a">⇄ SPLIT / RAGGRUPPAMENTO</span>, inserisci ticker, data e rapporto. L'app ricalcola automaticamente quantità e prezzi di tutti gli acquisti precedenti.</div>
+            </div>
+          </div>
+          <div class="gu-tip">💡 <strong>Consiglio:</strong> inserisci gli acquisti in ordine cronologico, dal più vecchio al più recente. Il calcolo FIFO risulterà sempre corretto.</div>
+        </div>
       </div>
     </div>
-    <div class="gu-step">
-      <div class="gu-num">2</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">▣ Azioni — solo il portafoglio azionario</div>
-        <div class="gu-step-desc">Il grafico a ciambella mostra come sono distribuiti i tuoi soldi tra i titoli. Se un pezzo è molto grande, hai un'alta concentrazione su quel titolo. La tabella riporta per ogni posizione: PMC, prezzo live, variazione del giorno, P&amp;L e CAGR.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">3</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Portafoglio — dettaglio con prezzi live</div>
-        <div class="gu-step-desc">La tab più completa per le azioni. I prezzi vengono aggiornati automaticamente ogni 60 secondi dal foglio Google. Se un titolo non ha il prezzo live, compare un campo dove puoi inserirlo manualmente. Il pulsante <span class="gu-pill">↺ Ora</span> forza l'aggiornamento immediato.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">4</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Log — storico completo</div>
-        <div class="gu-step-desc">Tutte le operazioni in ordine cronologico. Da qui puoi esportare in CSV per il commercialista o cancellare l'intero portafoglio con il tasto Reset.</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- SEZIONE 4 -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">💰</span> PMC e metodo FIFO</h2>
-    <div class="gu-step">
-      <div class="gu-num">1</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Cos'è il PMC (Prezzo Medio di Carico)</div>
-        <div class="gu-step-desc">Compri <strong>100 azioni a €10</strong> nel 2020. Nel 2023 ne compri altre <strong>100 a €20</strong>. Hai speso €3.000 per 200 azioni. Il tuo PMC è <strong>€15,00</strong> (= 3.000 ÷ 200). Se oggi l'azione vale €18, il portafoglio vale €3.600: guadagno latente di €600.</div>
+    <!-- SEZIONE 2 — TAB -->
+    <div class="gu-section" id="sec2">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">▣</span>
+          <span class="gu-section-title">Cosa vedi nelle varie tab</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-step">
+            <div class="gu-num">1</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">◉ Totale — il quadro completo</div>
+              <div class="gu-step-desc">Mostra il patrimonio complessivo sommando azioni e fondi. Trovi il P&amp;L latente (sulla carta), il P&amp;L realizzato (incassato) e il CAGR totale ponderato. La barra di composizione divide il peso tra azioni e fondi.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">2</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">▣ Azioni — solo il portafoglio azionario</div>
+              <div class="gu-step-desc">Il grafico a ciambella mostra come sono distribuiti i tuoi soldi tra i titoli. Se un pezzo è molto grande, hai un'alta concentrazione su quel titolo. La tabella riporta per ogni posizione: PMC, prezzo live, variazione del giorno, P&amp;L e CAGR.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">3</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Portafoglio — dettaglio con prezzi live</div>
+              <div class="gu-step-desc">La tab più completa per le azioni. I prezzi si aggiornano ogni 60 secondi dal foglio Google. Se un titolo non ha il prezzo live, compare un campo per inserirlo manualmente. Il pulsante <span class="gu-pill">↺ Ora</span> forza l'aggiornamento immediato.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">4</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Log — storico completo</div>
+              <div class="gu-step-desc">Tutte le operazioni in ordine cronologico. Da qui puoi esportare in CSV (utile per il commercialista) o cancellare l'intero portafoglio con il tasto Reset.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="gu-step">
-      <div class="gu-num">2</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Perché si usa il metodo FIFO</div>
-        <div class="gu-step-desc">FIFO = <em>First In, First Out</em>: quando vendi, si considerano vendute prima le azioni comprate per prime. È il metodo obbligatorio in Italia per il calcolo delle plusvalenze. Se vendi 50 azioni, l'app assume che siano le prime 50 acquistate — non le più recenti.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">3</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Cos'è il CAGR</div>
-        <div class="gu-step-desc">Il rendimento annuo composto risponde a: <em>"Se avessi messo i soldi in banca a tasso fisso, quale tasso avrei dovuto avere per ottenere lo stesso risultato?"</em> Un CAGR <span class="gu-pill g">+7%/a</span> significa che i tuoi soldi crescono del 7% ogni anno in media. È il modo più corretto per confrontare investimenti di durata diversa.</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- SEZIONE 5 -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">🧾</span> Tasse: Simulatore e Zainetto Fiscale</h2>
-    <div class="gu-step">
-      <div class="gu-num">1</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Il Simulatore Capital Gain</div>
-        <div class="gu-step-desc">Nella tab <span class="gu-pill">Simulatore CG</span> puoi simulare una vendita ipotetica: scegli il titolo, la quantità e il prezzo, e l'app calcola in tempo reale quante tasse dovresti pagare. L'aliquota standard in Italia è il <strong>26%</strong> sulla plusvalenza netta. Il simulatore mostra anche 7 scenari di prezzo: -30%, -20%, -10%, base, +10%, +20%, +30%.</div>
+    <!-- SEZIONE 3 — PMC / FIFO -->
+    <div class="gu-section" id="sec3">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">💰</span>
+          <span class="gu-section-title">PMC e metodo FIFO</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-step">
+            <div class="gu-num">1</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Cos'è il PMC (Prezzo Medio di Carico)</div>
+              <div class="gu-step-desc">Compri <strong>100 azioni a €10</strong> nel 2020. Nel 2023 ne compri altre <strong>100 a €20</strong>. Hai speso €3.000 per 200 azioni: il tuo PMC è <strong>€15,00</strong> (= 3.000 ÷ 200). Se oggi l'azione vale €18, il portafoglio vale €3.600: guadagno latente di €600.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">2</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Perché si usa il metodo FIFO</div>
+              <div class="gu-step-desc">FIFO = <em>First In, First Out</em>: quando vendi, si considerano vendute prima le azioni comprate per prime. È il metodo obbligatorio in Italia per il calcolo delle plusvalenze. Se vendi 50 azioni, l'app assume che siano le prime 50 acquistate — non le più recenti.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">3</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Cos'è il CAGR</div>
+              <div class="gu-step-desc">Il rendimento annuo composto risponde a: <em>"Quale tasso fisso annuo avrei dovuto avere per ottenere lo stesso risultato?"</em> Un CAGR <span class="gu-pill g">+7%/a</span> significa che i tuoi soldi crescono del 7% ogni anno in media. È il modo corretto per confrontare investimenti di durata diversa.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="gu-step">
-      <div class="gu-num">2</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Lo Zainetto Fiscale</div>
-        <div class="gu-step-desc">Le perdite realizzate (minusvalenze) possono compensare i guadagni futuri entro <strong>4 anni</strong>. Se hai perso €1.000 vendendo un titolo in perdita, puoi usare quei €1.000 per ridurre la base imponibile di vendite future. Lo Zainetto mostra anno per anno il saldo disponibile e la data di scadenza.</div>
-      </div>
-    </div>
-    <div class="gu-tip">⚠ <strong>Attenzione:</strong> questa app è un supporto al calcolo personale. Per la dichiarazione fiscale ufficiale rivolgiti sempre al tuo commercialista o al CAF.</div>
-  </div>
 
-  <!-- SEZIONE 6 -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">🔔</span> Alert Prezzi</h2>
-    <div class="gu-step">
-      <div class="gu-num">1</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Come funzionano gli alert</div>
-        <div class="gu-step-desc">Per ogni titolo in portafoglio puoi impostare un <strong>Target</strong> (prezzo obiettivo verso l'alto) e uno <strong>Stop Loss</strong> (soglia di attenzione verso il basso). Quando il prezzo live supera o tocca la soglia, compare una notifica nell'app. Gli alert funzionano solo mentre il browser è aperto.</div>
+    <!-- SEZIONE 4 — TASSE -->
+    <div class="gu-section" id="sec4">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">🧾</span>
+          <span class="gu-section-title">Tasse: Simulatore e Zainetto Fiscale</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-step">
+            <div class="gu-num">1</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Il Simulatore Capital Gain</div>
+              <div class="gu-step-desc">Nella tab <span class="gu-pill">Simulatore CG</span> puoi simulare una vendita ipotetica: scegli titolo, quantità e prezzo, e l'app calcola in tempo reale le tasse dovute. L'aliquota standard in Italia è il <strong>26%</strong> sulla plusvalenza netta. Il simulatore mostra anche 7 scenari di prezzo: da −30% a +30%.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">2</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Lo Zainetto Fiscale</div>
+              <div class="gu-step-desc">Le perdite realizzate (minusvalenze) possono compensare i guadagni futuri entro <strong>4 anni</strong>. Se hai perso €1.000 vendendo in perdita, puoi usarli per ridurre la base imponibile di vendite future. Lo Zainetto mostra anno per anno il saldo disponibile e la data di scadenza.</div>
+            </div>
+          </div>
+          <div class="gu-warn">⚠ <strong>Attenzione:</strong> questa app è un supporto al calcolo personale. Per la dichiarazione fiscale ufficiale rivolgiti sempre al tuo commercialista o al CAF.</div>
+        </div>
       </div>
     </div>
-    <div class="gu-step">
-      <div class="gu-num">2</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Log alert scattati</div>
-        <div class="gu-step-desc">Nella parte bassa della tab Alert trovi lo storico delle notifiche scattate, con orario, tipo (TARGET o STOP), soglia e prezzo rilevato. Utile per tenere traccia dei momenti di volatilità.</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- SEZIONE 7 -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">◈</span> Fondi comuni (OICR)</h2>
-    <div class="gu-step">
-      <div class="gu-num">1</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Differenza tra fondo e azione</div>
-        <div class="gu-step-desc">Un fondo comune (es. <strong>Anima</strong>, <strong>Fideuram</strong>, <strong>Mediolanum</strong>) è gestito da professionisti. Non compri azioni in borsa: sottoscrivi <strong>quote</strong> a un prezzo chiamato <strong>NAV</strong> (Net Asset Value). Il NAV viene pubblicato ogni giorno lavorativo dalla società di gestione — non è disponibile in tempo reale come i prezzi azionari.</div>
+    <!-- SEZIONE 5 — ALERT -->
+    <div class="gu-section" id="sec5">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">🔔</span>
+          <span class="gu-section-title">Alert prezzi</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-step">
+            <div class="gu-num">1</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Come funzionano gli alert</div>
+              <div class="gu-step-desc">Per ogni titolo in portafoglio puoi impostare un <strong>Target</strong> (prezzo obiettivo verso l'alto) e uno <strong>Stop Loss</strong> (soglia di attenzione verso il basso). Quando il prezzo live raggiunge la soglia, compare una notifica nell'app. Gli alert funzionano solo mentre il browser è aperto.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">2</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Log alert scattati</div>
+              <div class="gu-step-desc">Nella parte bassa della tab Alert trovi lo storico delle notifiche scattate, con orario, tipo (TARGET o STOP), soglia e prezzo rilevato. Utile per tenere traccia dei momenti di volatilità.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="gu-step">
-      <div class="gu-num">2</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Crea il fondo con <span class="gu-pill g">+ Nuovo fondo</span></div>
-        <div class="gu-step-desc">Inserisci nome, ISIN (codice identificativo, es. IT0001234567), società di gestione e categoria. L'ISIN lo trovi sull'estratto conto bancario o su <strong>morningstar.it</strong>.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">3</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Registra movimenti con <span class="gu-pill g">+ Movimento</span></div>
-        <div class="gu-step-desc"><strong>Sottoscrizione</strong> = hai versato soldi (acquisto quote). <strong>Rimborso</strong> = hai ritirato soldi (vendita quote). Per ogni movimento inserisci data, numero di quote, NAV del giorno e commissioni.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">4</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Aggiorna il NAV con <span class="gu-pill">↺ Aggiorna NAV</span></div>
-        <div class="gu-step-desc">Per vedere il valore aggiornato, inserisci il NAV corrente per ogni fondo. Lo trovi sul sito della società di gestione o nell'area clienti della banca. Finché non aggiorni, l'app usa il NAV medio di carico come stima.</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- SEZIONE 8 -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">☁️</span> Dati e sicurezza</h2>
-    <div class="gu-step">
-      <div class="gu-num">1</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">I tuoi dati sono su Firebase (Google Cloud)</div>
-        <div class="gu-step-desc">Le operazioni, i fondi e le impostazioni vengono salvati automaticamente su <strong>Firebase Firestore</strong> — il database cloud di Google. Ogni utente accede con il proprio account Google e vede solo il proprio portafoglio. I dati sono accessibili da qualsiasi PC o browser dopo il login.</div>
+    <!-- SEZIONE 6 — FONDI -->
+    <div class="gu-section" id="sec6">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">◈</span>
+          <span class="gu-section-title">Fondi comuni (OICR)</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-step">
+            <div class="gu-num">1</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Differenza tra fondo e azione</div>
+              <div class="gu-step-desc">Un fondo comune (es. <strong>Anima</strong>, <strong>Fideuram</strong>, <strong>Mediolanum</strong>) è gestito da professionisti. Non compri azioni in borsa: sottoscrivi <strong>quote</strong> a un prezzo chiamato <strong>NAV</strong> (Net Asset Value), pubblicato ogni giorno lavorativo dalla società di gestione — non è disponibile in tempo reale come i prezzi azionari.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">2</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Crea il fondo con <span class="gu-pill g">+ Nuovo fondo</span></div>
+              <div class="gu-step-desc">Inserisci nome, ISIN (es. IT0001234567), società di gestione e categoria. L'ISIN lo trovi sull'estratto conto bancario o su <strong>morningstar.it</strong>.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">3</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Registra movimenti con <span class="gu-pill g">+ Movimento</span></div>
+              <div class="gu-step-desc"><strong>Sottoscrizione</strong> = hai versato denaro (acquisto quote). <strong>Rimborso</strong> = hai ritirato denaro (vendita quote). Per ogni movimento inserisci data, numero di quote, NAV del giorno e commissioni.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">4</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Aggiorna il NAV con <span class="gu-pill">↺ Aggiorna NAV</span></div>
+              <div class="gu-step-desc">Per vedere il valore corrente, inserisci il NAV aggiornato per ogni fondo. Lo trovi sul sito della società di gestione o nell'area clienti della banca. Finché non aggiorni, l'app usa il NAV medio di carico come stima.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="gu-step">
-      <div class="gu-num">2</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Backup manuale</div>
-        <div class="gu-step-desc">Puoi sempre scaricare un backup completo cliccando <span class="gu-pill">↓ Salva</span> in alto a destra. Il file JSON contiene tutte le operazioni, fondi e impostazioni. Per ripristinare usa <span class="gu-pill">↑ Importa</span>.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num">3</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">I prezzi: Google Sheet + Apps Script</div>
-        <div class="gu-step-desc">I prezzi live vengono letti da un foglio Google gestito da GAM, tramite Google Apps Script. Il foglio usa <strong>GOOGLEFINANCE()</strong> per aggiornare i prezzi in automatico. I prezzi si aggiornano ogni 60 secondi nell'app. Se un titolo non è nel foglio, il prezzo non si aggiorna — chiedi a GAM di aggiungerlo.</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- SEZIONE 9 - GLOSSARIO -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">📖</span> Glossario</h2>
-    <div class="gu-glossary">
-      <div class="gu-term"><div class="gu-term-name">Ticker</div><div class="gu-term-def">Codice breve di un'azione. Es: BIT:ENI = ENI su Borsa Italiana, BIT:RACE = Ferrari.</div></div>
-      <div class="gu-term"><div class="gu-term-name">Stock Split</div><div class="gu-term-def">Frazionamento azionario: ogni azione viene divisa in più azioni (es. 1 → 10). Il prezzo si riduce proporzionalmente, il valore totale non cambia.</div></div>
-      <div class="gu-term"><div class="gu-term-name">Raggruppamento (Reverse Split)</div><div class="gu-term-def">Operazione inversa allo split: più azioni vengono fuse in una (es. 10 → 1). Il prezzo sale proporzionalmente.</div></div>
-      <div class="gu-term"><div class="gu-term-name">PMC — Prezzo Medio di Carico</div><div class="gu-term-def">Il prezzo medio di acquisto ponderato per le quantità. Base di calcolo per il P&amp;L.</div></div>
-      <div class="gu-term"><div class="gu-term-name">P&amp;L Latente</div><div class="gu-term-def">Guadagno o perdita "sulla carta". Diventa reale solo quando vendi.</div></div>
-      <div class="gu-term"><div class="gu-term-name">P&amp;L Realizzato</div><div class="gu-term-def">Guadagno o perdita effettivi, già incassati da vendite chiuse.</div></div>
-      <div class="gu-term"><div class="gu-term-name">FIFO — First In, First Out</div><div class="gu-term-def">Le prime azioni comprate sono le prime considerate vendute. Metodo obbligatorio in Italia.</div></div>
-      <div class="gu-term"><div class="gu-term-name">CAGR</div><div class="gu-term-def">Rendimento annuo composto. Misura quanto crescono i tuoi soldi ogni anno in media.</div></div>
-      <div class="gu-term"><div class="gu-term-name">Capital Gain</div><div class="gu-term-def">Guadagno tassabile: differenza tra prezzo di vendita e prezzo di acquisto. In Italia tassato al 26%.</div></div>
-      <div class="gu-term"><div class="gu-term-name">Stop Loss</div><div class="gu-term-def">Soglia di prezzo minima: se il titolo scende fino a quel livello è il segnale di valutare la vendita.</div></div>
-      <div class="gu-term"><div class="gu-term-name">NAV — Net Asset Value</div><div class="gu-term-def">Valore netto per quota di un fondo comune. Pubblicato ogni giorno lavorativo dalla SGR.</div></div>
-      <div class="gu-term"><div class="gu-term-name">Zainetto Fiscale</div><div class="gu-term-def">Saldo delle minusvalenze compensabili con plusvalenze future entro 4 anni dall'anno di realizzo.</div></div>
-      <div class="gu-term"><div class="gu-term-name">Commissione</div><div class="gu-term-def">Costo fisso addebitato dal broker per ogni operazione di acquisto o vendita.</div></div>
-      <div class="gu-term"><div class="gu-term-name">ISIN</div><div class="gu-term-def">Codice identificativo internazionale di un titolo o fondo. Formato: 2 lettere + 10 caratteri.</div></div>
+    <!-- SEZIONE 7 — DATI -->
+    <div class="gu-section" id="sec7">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">☁️</span>
+          <span class="gu-section-title">Dati e sicurezza</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-step">
+            <div class="gu-num">1</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">I tuoi dati sono su Firebase (Google Cloud)</div>
+              <div class="gu-step-desc">Operazioni, fondi e impostazioni vengono salvati automaticamente su <strong>Firebase Firestore</strong> — il database cloud di Google. Ogni utente accede con il proprio account Google e vede solo il proprio portafoglio. I dati sono accessibili da qualsiasi PC o browser dopo il login.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">2</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Backup manuale</div>
+              <div class="gu-step-desc">Clicca <span class="gu-pill">↓ Salva</span> in alto a destra per scaricare un backup completo. Il file JSON contiene tutte le operazioni, fondi e impostazioni. Per ripristinare usa <span class="gu-pill">↑ Importa</span>.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num">3</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">I prezzi: Google Sheet + Apps Script</div>
+              <div class="gu-step-desc">I prezzi live vengono letti da un foglio Google gestito da GAM tramite Google Apps Script. Il foglio usa <strong>GOOGLEFINANCE()</strong> per aggiornare i prezzi in automatico ogni 60 secondi. Se un titolo non è nel foglio, il prezzo non si aggiorna — chiedi a GAM di aggiungerlo.</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <!-- SEZIONE 10 - FAQ -->
-  <div class="gu-section">
-    <h2><span class="gu-icon">❓</span> Domande frequenti</h2>
-    <div class="gu-step">
-      <div class="gu-num q">?</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">I prezzi sono in tempo reale?</div>
-        <div class="gu-step-desc">I prezzi provengono da Google Finance tramite un foglio Google gestito da GAM. Si aggiornano automaticamente ogni 60 secondi mentre hai il browser aperto. Per i mercati chiusi (es. weekend) viene mostrato l'ultimo prezzo disponibile.</div>
+    <!-- SEZIONE 8 — GLOSSARIO -->
+    <div class="gu-section" id="sec8">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">📖</span>
+          <span class="gu-section-title">Glossario</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-glossary">
+            <div class="gu-term"><div class="gu-term-name">Ticker</div><div class="gu-term-def">Codice breve di un'azione. Es: BIT:ENI = ENI su Borsa Italiana, BIT:RACE = Ferrari.</div></div>
+            <div class="gu-term"><div class="gu-term-name">Stock Split</div><div class="gu-term-def">Frazionamento azionario: ogni azione viene divisa in più azioni (es. 1 → 10). Il prezzo si riduce proporzionalmente, il valore totale non cambia.</div></div>
+            <div class="gu-term"><div class="gu-term-name">Raggruppamento (Reverse Split)</div><div class="gu-term-def">Operazione inversa allo split: più azioni vengono fuse in una (es. 10 → 1). Il prezzo sale proporzionalmente.</div></div>
+            <div class="gu-term"><div class="gu-term-name">PMC — Prezzo Medio di Carico</div><div class="gu-term-def">Il prezzo medio di acquisto ponderato per le quantità. Base di calcolo per il P&amp;L.</div></div>
+            <div class="gu-term"><div class="gu-term-name">P&amp;L Latente</div><div class="gu-term-def">Guadagno o perdita "sulla carta". Diventa reale solo quando vendi.</div></div>
+            <div class="gu-term"><div class="gu-term-name">P&amp;L Realizzato</div><div class="gu-term-def">Guadagno o perdita effettivi, già incassati da vendite chiuse.</div></div>
+            <div class="gu-term"><div class="gu-term-name">FIFO — First In, First Out</div><div class="gu-term-def">Le prime azioni comprate sono le prime considerate vendute. Metodo obbligatorio in Italia.</div></div>
+            <div class="gu-term"><div class="gu-term-name">CAGR</div><div class="gu-term-def">Rendimento annuo composto. Misura quanto crescono i tuoi soldi ogni anno in media.</div></div>
+            <div class="gu-term"><div class="gu-term-name">Capital Gain</div><div class="gu-term-def">Guadagno tassabile: differenza tra prezzo di vendita e prezzo di acquisto. In Italia tassato al 26%.</div></div>
+            <div class="gu-term"><div class="gu-term-name">Stop Loss</div><div class="gu-term-def">Soglia di prezzo minima: se il titolo scende fino a quel livello è il segnale di valutare la vendita.</div></div>
+            <div class="gu-term"><div class="gu-term-name">NAV — Net Asset Value</div><div class="gu-term-def">Valore netto per quota di un fondo comune. Pubblicato ogni giorno lavorativo dalla SGR.</div></div>
+            <div class="gu-term"><div class="gu-term-name">Zainetto Fiscale</div><div class="gu-term-def">Saldo delle minusvalenze compensabili con plusvalenze future entro 4 anni dall'anno di realizzo.</div></div>
+            <div class="gu-term"><div class="gu-term-name">Commissione</div><div class="gu-term-def">Costo fisso addebitato dal broker per ogni operazione di acquisto o vendita.</div></div>
+            <div class="gu-term"><div class="gu-term-name">ISIN</div><div class="gu-term-def">Codice identificativo internazionale di un titolo o fondo. Formato: 2 lettere + 10 caratteri.</div></div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="gu-step">
-      <div class="gu-num q">?</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Come gestisco uno stock split o un raggruppamento?</div>
-        <div class="gu-step-desc">Vai su <span class="gu-pill">+ Operazione</span>, seleziona tipo <span class="gu-pill a">⇄ SPLIT / RAGGRUPPAMENTO</span> e compila:
-          <br><strong>Ticker:</strong> il titolo interessato (es. <span class="gu-pill">NVDA</span>).
-          <br><strong>Data:</strong> la data effettiva dello split.
-          <br><strong>Rapporto:</strong> inserisci il fattore moltiplicativo. Per uno split 10:1 (ogni azione diventa 10) inserisci <strong>10</strong>. Per un raggruppamento 10:1 (10 azioni diventano 1) inserisci <strong>0.1</strong>.
-          <br><br>L'app moltiplica le quantità e divide i prezzi di tutti gli acquisti precedenti a quella data. Nel log appare una riga <span class="gu-pill a">⇄ SPLIT</span> che non incide sul P&amp;L. Esempio: avevi 4 azioni NVIDIA a $900 → dopo split 10:1 diventano 40 azioni a $90, PMC invariato in valore totale.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num q">?</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Posso usarla da più dispositivi?</div>
-        <div class="gu-step-desc">Sì. I dati sono salvati su Firebase e accessibili da qualsiasi PC, tablet o smartphone. Basta accedere con lo stesso account Google.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num q">?</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Cosa succede se il prezzo live non carica?</div>
-        <div class="gu-step-desc">Nella tab Portafoglio appare un campo dove puoi inserire il prezzo manualmente. Tutti i calcoli continuano a funzionare normalmente con il prezzo inserito.</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num q">?</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Posso usarla per ETF?</div>
-        <div class="gu-step-desc">Sì, ma solo se il ticker è presente nel foglio prezzi. Chiedi a GAM di aggiungere il ticker dell'ETF che ti interessa (es. <span class="gu-pill">BIT:SWDA</span> per iShares Core MSCI World su Borsa Italiana).</div>
-      </div>
-    </div>
-    <div class="gu-step">
-      <div class="gu-num q">?</div>
-      <div class="gu-step-body">
-        <div class="gu-step-title">Come aggiungo un nuovo titolo al foglio prezzi?</div>
-        <div class="gu-step-desc">Non puoi farlo direttamente — il foglio prezzi è gestito da GAM. Contatta GAM indicando il ticker esatto del titolo che vuoi aggiungere. Una volta aggiunto, il prezzo si aggiornerà automaticamente nell'app.</div>
-      </div>
-    </div>
-  </div>
 
+    <!-- SEZIONE 9 — FAQ -->
+    <div class="gu-section" id="sec9">
+      <div class="gu-section-header" onclick="toggleSection(this)">
+        <div class="gu-section-left">
+          <span class="gu-section-icon">❓</span>
+          <span class="gu-section-title">Domande frequenti</span>
+        </div>
+        <div class="gu-chevron">▾</div>
+      </div>
+      <div class="gu-section-body">
+        <div class="gu-section-inner">
+          <div class="gu-step">
+            <div class="gu-num q">?</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">I prezzi sono in tempo reale?</div>
+              <div class="gu-step-desc">I prezzi provengono da Google Finance tramite un foglio Google gestito da GAM. Si aggiornano automaticamente ogni 60 secondi mentre hai il browser aperto. Per i mercati chiusi (es. weekend) viene mostrato l'ultimo prezzo disponibile.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num q">?</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Come gestisco uno stock split o un raggruppamento?</div>
+              <div class="gu-step-desc">Vai su <span class="gu-pill">+ Operazione</span>, seleziona tipo <span class="gu-pill a">⇄ SPLIT / RAGGRUPPAMENTO</span> e compila:
+                <br><strong>Ticker:</strong> il titolo interessato (es. <span class="gu-pill">NVDA</span>).
+                <br><strong>Data:</strong> la data effettiva dello split.
+                <br><strong>Rapporto:</strong> per uno split 10:1 (ogni azione diventa 10) inserisci <strong>10</strong>. Per un raggruppamento 10:1 (10 azioni diventano 1) inserisci <strong>0.1</strong>.
+                <br><br>L'app moltiplica le quantità e divide i prezzi di tutti gli acquisti precedenti a quella data. Nel log appare una riga <span class="gu-pill a">⇄ SPLIT</span> che non incide sul P&amp;L. Esempio: 4 azioni NVIDIA a $900 → dopo split 10:1 diventano 40 azioni a $90, PMC invariato.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num q">?</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Posso usarla da più dispositivi?</div>
+              <div class="gu-step-desc">Sì. I dati sono salvati su Firebase e accessibili da qualsiasi PC, tablet o smartphone. Basta accedere con lo stesso account Google.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num q">?</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Cosa succede se il prezzo live non carica?</div>
+              <div class="gu-step-desc">Nella tab Portafoglio appare un campo dove puoi inserire il prezzo manualmente. Tutti i calcoli continuano a funzionare normalmente con il prezzo inserito.</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num q">?</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Posso usarla per ETF?</div>
+              <div class="gu-step-desc">Sì, ma solo se il ticker è presente nel foglio prezzi. Chiedi a GAM di aggiungere il ticker dell'ETF che ti interessa (es. <span class="gu-pill">BIT:SWDA</span> per iShares Core MSCI World su Borsa Italiana).</div>
+            </div>
+          </div>
+          <div class="gu-step">
+            <div class="gu-num q">?</div>
+            <div class="gu-step-body">
+              <div class="gu-step-title">Come aggiungo un nuovo titolo al foglio prezzi?</div>
+              <div class="gu-step-desc">Non puoi farlo direttamente — il foglio prezzi è gestito da GAM. Contatta GAM indicando il ticker esatto del titolo che vuoi aggiungere. Una volta aggiunto, il prezzo si aggiornerà automaticamente nell'app.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
 </div>
-</main>
 
 <script>
+// ── Theme ──
 var isDark = true;
 try { isDark = localStorage.getItem('pd3_theme') !== 'light'; } catch(e) {}
 function applyTheme() {
@@ -430,6 +666,59 @@ function toggleTheme() {
   applyTheme();
 }
 applyTheme();
+
+// ── Accordion ──
+function toggleSection(header) {
+  var section = header.parentElement;
+  var wasOpen = section.classList.contains('open');
+  section.classList.toggle('open', !wasOpen);
+}
+
+// ── Sidebar (mobile) ──
+function toggleSidebar() {
+  var s = document.getElementById('sidebar');
+  var o = document.getElementById('overlay');
+  var open = s.classList.toggle('open');
+  o.classList.toggle('show', open);
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ── Nav click: expand target section + close mobile sidebar ──
+function navClick(link) {
+  var id = link.getAttribute('href').replace('#','');
+  var target = document.getElementById(id);
+  if (target && !target.classList.contains('open')) {
+    target.classList.add('open');
+  }
+  closeSidebar();
+  // highlight active link
+  document.querySelectorAll('.nav-link').forEach(function(l){ l.classList.remove('active'); });
+  link.classList.add('active');
+}
+
+// ── Scroll progress bar ──
+window.addEventListener('scroll', function() {
+  var doc = document.documentElement;
+  var scrolled = doc.scrollTop / (doc.scrollHeight - doc.clientHeight) * 100;
+  document.getElementById('progress').style.width = scrolled + '%';
+});
+
+// ── Active nav on scroll ──
+var sections = document.querySelectorAll('.gu-section');
+var navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', function() {
+  var scrollY = window.scrollY + 80;
+  var current = '';
+  sections.forEach(function(s) {
+    if (s.offsetTop <= scrollY) current = s.id;
+  });
+  navLinks.forEach(function(l) {
+    l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+  });
+}, { passive: true });
 </script>
 </body>
 </html>
