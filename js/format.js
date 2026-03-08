@@ -13,3 +13,9 @@ function f(n, d) {
 function fe(n) { return '€\u00a0' + f(n); }
 function fp(n) { return f(n) + '%'; }
 function cc(n) { return n > 0.001 ? 'pos' : n < -0.001 ? 'neg' : 'dmc'; }
+function fmtDate(d) {
+  if (!d) return '—';
+  var p = d.split('-');
+  if (p.length !== 3) return d;
+  return p[2] + '-' + p[1] + '-' + p[0];
+}

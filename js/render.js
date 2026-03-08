@@ -212,7 +212,7 @@ function renderOvPanel() {
     for (var i = 0; i < sorted.length; i++) {
       var op = sorted[i], ctv = op.qty * op.price;
       var plHtml = (op.type === 'sell' && op._pl !== undefined) ? '<span class="' + cc(op._pl) + '">' + fe(op._pl) + '</span>' : '<span class="dmc">—</span>';
-      rrows += '<tr><td class="dmc">' + op.date + '</td><td><span class="tag ' + op.type + '">' + (op.type === 'buy' ? '▲ ACQ' : op.type === 'split' ? '⇄ SPLIT' : '▼ VEN') + '</span></td>';
+      rrows += '<tr><td class="dmc">' + fmtDate(op.date) + '</td><td><span class="tag ' + op.type + '">' + (op.type === 'buy' ? '▲ ACQ' : op.type === 'split' ? '⇄ SPLIT' : '▼ VEN') + '</span></td>';
       rrows += tkCellSm(op.ticker) + '<td class="dmc">' + f(op.qty, op.qty % 1 === 0 ? 0 : 4) + '</td>';
       rrows += '<td>' + fe(op.price) + '</td><td>' + fe(ctv) + '</td><td>' + plHtml + '</td></tr>';
     }
@@ -265,10 +265,10 @@ function renderOpPanel() {
     var opQty1   = op.type==='split' ? 'x' + op.qty : f(op.qty, op.qty%1===0?0:4);
     var opPrice1 = op.type==='split' ? '<span class="dmc">—</span>' : fe(op.price);
     var opCtv1   = op.type==='split' ? '<span class="dmc">—</span>' : fe(op.qty*op.price);
-    rows += '<tr><td class="dmc">' + op.date + '</td><td>' + opTag1 + '</td>';
+    rows += '<tr><td class="dmc">' + fmtDate(op.date) + '</td><td>' + opTag1 + '</td>';
     rows += tkCellSm(op.ticker) + '<td>' + opQty1 + '</td><td>' + opPrice1 + '</td>';
     rows += '<td>' + opCtv1 + '</td><td class="dmc">' + fe(op.comm) + '</td><td>' + plHtml + '</td>';
-    rows += '<td style="white-space:nowrap"><button class="btn btn-n btn-sm" style="padding:2px 7px;margin-right:3px" onclick="editOp(' + op.id + ')">✎</button><button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delOp(' + op.id + ')">🗑</button></td></tr>';
+    rows += '<td><button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delOp(' + op.id + ')">🗑</button></td></tr>';
   }
   tb.innerHTML = rows;
 }
@@ -287,13 +287,11 @@ function renderLogPanel() {
     var opQty2   = op.type==='split' ? 'x' + op.qty : f(op.qty, op.qty%1===0?0:4);
     var opPrice2 = op.type==='split' ? '<span class="dmc">—</span>' : fe(op.price);
     var opCtv2   = op.type==='split' ? '<span class="dmc">rapporto ' + op.qty + ':1</span>' : fe(op.qty*op.price);
-    var noteHtml = op.note ? '<span title="' + op.note.replace(/"/g,'&quot;') + '" style="cursor:default;color:var(--au);font-size:11px" >💬</span>' : '';
-    rows += '<tr><td class="dmc">' + (sorted.length-i) + '</td><td class="dmc">' + op.date + '</td>';
+    rows += '<tr><td class="dmc">' + (sorted.length-i) + '</td><td class="dmc">' + fmtDate(op.date) + '</td>';
     rows += '<td>' + opTag2 + '</td>' + tkCellSm(op.ticker);
     rows += '<td>' + opQty2 + '</td><td>' + opPrice2 + '</td>';
     rows += '<td>' + opCtv2 + '</td><td class="dmc">' + fe(op.comm) + '</td>';
-    rows += '<td>' + plHtml + '</td><td class="dmc">' + pmcHtml + ' ' + noteHtml + '</td>';
-    rows += '<td style="white-space:nowrap"><button class="btn btn-n btn-sm" style="padding:2px 7px;margin-right:3px" onclick="editOp(' + op.id + ')">✎</button><button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delOp(' + op.id + ')">🗑</button></td></tr>';
+    rows += '<td>' + plHtml + '</td><td class="dmc">' + pmcHtml + '</td></tr>';
   }
   tb.innerHTML = rows;
 }
@@ -418,7 +416,7 @@ function renderZnPanel() {
       var s = sellsSorted[i], plNetto = s._pl;
       var tipo    = plNetto >= 0 ? '<span class="pos">Plusvalenza</span>' : '<span class="neg">Minusvalenza</span>';
       var plLordo = s.qty * s.price - (s._cost || 0);
-      orows += '<tr><td class="dmc">' + s.date + '</td>' + tkCellSm(s.ticker);
+      orows += '<tr><td class="dmc">' + fmtDate(s.date) + '</td>' + tkCellSm(s.ticker);
       orows += '<td>' + f(s.qty, s.qty%1===0?0:4) + '</td><td>' + fe(s.price) + '</td>';
       orows += '<td class="dmc">' + (s._pmc ? fe(s._pmc) : '—') + '</td>';
       orows += '<td><span class="' + cc(plLordo) + '">' + fe(plLordo) + '</span></td>';

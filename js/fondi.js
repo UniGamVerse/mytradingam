@@ -114,12 +114,6 @@ function delFondo(id) {
   saveFondi(); renderFnPanel();
 }
 
-function delSub(id) {
-  if (!confirm('Eliminare questo movimento?')) return;
-  fnMovs = fnMovs.filter(function(m){ return m.id !== id; });
-  saveFondi(); renderFnPanel();
-}
-
 function openSubModal(fondoId) {
   populateFondoSelect('fn-sub-fondo', fondoId);
   document.getElementById('fn-sub-data').value  = new Date().toISOString().slice(0,10);
@@ -151,42 +145,6 @@ function saveSub() {
   }
   fnMovs.push({ id: Date.now(), fondoId: fondoId, tipo: tipo, data: data, quote: quote, nav: nav, comm: comm });
   saveFondi(); closeSubModal(); renderFnPanel();
-}
-
-function editSub(id) {
-  var mv = fnMovs.find(function(m){ return m.id === id; });
-  if (!mv) return;
-  var em = document.getElementById('modal-edit-sub');
-  em._editId = id;
-  populateFondoSelect('esub-fondo', mv.fondoId);
-  document.getElementById('esub-tipo').value  = mv.tipo;
-  document.getElementById('esub-data').value  = mv.data;
-  document.getElementById('esub-quote').value = mv.quote;
-  document.getElementById('esub-nav').value   = mv.nav;
-  document.getElementById('esub-comm').value  = mv.comm || 0;
-  document.getElementById('esub-note').value  = mv.note || '';
-  em.classList.add('open');
-}
-function closeEditSubModal() {
-  document.getElementById('modal-edit-sub').classList.remove('open');
-}
-function saveEditSub() {
-  var em      = document.getElementById('modal-edit-sub');
-  var mv      = fnMovs.find(function(m){ return m.id === em._editId; });
-  if (!mv) return;
-  var fondoId = parseInt(document.getElementById('esub-fondo').value);
-  var tipo    = document.getElementById('esub-tipo').value;
-  var data    = document.getElementById('esub-data').value;
-  var quote   = parseFloat(document.getElementById('esub-quote').value);
-  var nav     = parseFloat(document.getElementById('esub-nav').value);
-  var comm    = parseFloat(document.getElementById('esub-comm').value) || 0;
-  var note    = document.getElementById('esub-note').value.trim();
-  if (!fondoId || !data || isNaN(quote) || quote <= 0 || isNaN(nav) || nav <= 0) { alert('Compila tutti i campi obbligatori.'); return; }
-  mv.fondoId = fondoId; mv.tipo = tipo; mv.data = data;
-  mv.quote = quote; mv.nav = nav; mv.comm = comm;
-  mv.note = note || undefined;
-  saveFondi(); closeEditSubModal(); renderFnPanel();
-  if (typeof showToast === 'function') showToast('Movimento aggiornato ✓');
 }
 
 function openNavModal() {
@@ -304,13 +262,11 @@ function renderFnPanel() {
       var isSub  = m.tipo === 'sub';
       var plHtml = (!isSub && m._pl !== undefined) ? '<span class="' + cc(m._pl) + '">' + fe(m._pl) + '</span>' : '<span class="dmc">—</span>';
       lrows += '<tr>';
-      lrows += '<td class="dmc">' + m.data + '</td>';
+      lrows += '<td class="dmc">' + fmtDate(m.data) + '</td>';
       lrows += '<td><span class="tag ' + (isSub ? 'buy' : 'sell') + '">' + (isSub ? '▲ SUB' : '▼ RIM') + '</span></td>';
       lrows += '<td style="max-width:200px;white-space:normal;font-size:10px">' + fdName + '</td>';
       lrows += '<td>' + f(m.quote, 3) + '</td><td>' + fe(m.nav) + '</td><td>' + fe(m.quote * m.nav) + '</td>';
-      var noteHtml = m.note ? '<span title="' + m.note.replace(/"/g,'&quot;') + '" style="cursor:default;color:var(--au);font-size:11px">💬</span>' : '';
-      lrows += '<td class="dmc">' + fe(m.comm) + '</td><td>' + plHtml + ' ' + noteHtml + '</td>';
-      lrows += '<td style="white-space:nowrap"><button class="btn btn-n btn-sm" style="padding:2px 7px;margin-right:3px" onclick="editSub(' + m.id + ')">✎</button><button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delSub(' + m.id + ')">🗑</button></td>';
+      lrows += '<td class="dmc">' + fe(m.comm) + '</td><td>' + plHtml + '</td>';
       lrows += '</tr>';
     }
     ltb.innerHTML = lrows;
