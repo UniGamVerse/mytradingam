@@ -268,7 +268,7 @@ function renderOpPanel() {
     rows += '<tr><td class="dmc">' + fmtDate(op.date) + '</td><td>' + opTag1 + '</td>';
     rows += tkCellSm(op.ticker) + '<td>' + opQty1 + '</td><td>' + opPrice1 + '</td>';
     rows += '<td>' + opCtv1 + '</td><td class="dmc">' + fe(op.comm) + '</td><td>' + plHtml + '</td>';
-    rows += '<td><button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delOp(' + op.id + ')">🗑</button></td></tr>';
+    rows += '<td style="white-space:nowrap"><button class="btn btn-n btn-sm" style="padding:2px 7px;margin-right:3px" onclick="editOp(' + op.id + ')">✎</button><button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delOp(' + op.id + ')">🗑</button></td></tr>';
   }
   tb.innerHTML = rows;
 }
@@ -287,11 +287,13 @@ function renderLogPanel() {
     var opQty2   = op.type==='split' ? 'x' + op.qty : f(op.qty, op.qty%1===0?0:4);
     var opPrice2 = op.type==='split' ? '<span class="dmc">—</span>' : fe(op.price);
     var opCtv2   = op.type==='split' ? '<span class="dmc">rapporto ' + op.qty + ':1</span>' : fe(op.qty*op.price);
+    var noteHtml = op.note ? '<span title="' + op.note.replace(/"/g,'&quot;') + '" style="cursor:default;color:var(--au);font-size:11px" >💬</span>' : '';
     rows += '<tr><td class="dmc">' + (sorted.length-i) + '</td><td class="dmc">' + fmtDate(op.date) + '</td>';
     rows += '<td>' + opTag2 + '</td>' + tkCellSm(op.ticker);
     rows += '<td>' + opQty2 + '</td><td>' + opPrice2 + '</td>';
     rows += '<td>' + opCtv2 + '</td><td class="dmc">' + fe(op.comm) + '</td>';
-    rows += '<td>' + plHtml + '</td><td class="dmc">' + pmcHtml + '</td></tr>';
+    rows += '<td>' + plHtml + '</td><td class="dmc">' + pmcHtml + ' ' + noteHtml + '</td>';
+    rows += '<td style="white-space:nowrap"><button class="btn btn-n btn-sm" style="padding:2px 7px;margin-right:3px" onclick="editOp(' + op.id + ')">✎</button><button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delOp(' + op.id + ')">🗑</button></td></tr>';
   }
   tb.innerHTML = rows;
 }
