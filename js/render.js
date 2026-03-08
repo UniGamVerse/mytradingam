@@ -2,6 +2,13 @@
 //  RENDER — funzioni di rendering per tutti i pannelli
 // ============================================================
 
+// Colore stabile per ticker: stesso ticker → sempre stesso colore PALETTE
+function tickerColor(ticker) {
+  var hash = 0;
+  for (var k = 0; k < ticker.length; k++) hash = ((hash << 5) - hash) + ticker.charCodeAt(k);
+  return PALETTE[Math.abs(hash) % PALETTE.length];
+}
+
 function renderAll() {
   buildFIFO();
   buildFondiFIFO();
@@ -183,7 +190,7 @@ function renderOvPanel() {
       var mv = p.qty * cp, pl = mv - p.cost, plp = p.cost > 0 ? (pl / p.cost) * 100 : 0;
       var lv = prices[p.ticker];
       var chgHtml = lv ? '<span class="' + cc(lv.change) + '">' + (lv.change >= 0 ? '+' : '') + f(lv.changePct) + '%</span>' : '<span class="dmc">—</span>';
-      var col = PALETTE[i % PALETTE.length];
+      var col = tickerColor(p.ticker);
       var alStatus = getAlertStatus(p.ticker, cp);
       var ovCagr   = cagrForPosition(p.ticker, p.cost, mv);
       rows += '<tr><td><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + col + '"></span></td>';
@@ -218,8 +225,8 @@ function drawDonut(pf, totalMkt) {
   var ctx    = canvas.getContext('2d');
   ctx.clearRect(0, 0, 200, 200);
   document.getElementById('dc-v').textContent = pf.length || '0';
-  var holeFill  = isDark ? '#111418' : '#ffffff';
-  var emptyFill = isDark ? '#1e2530' : '#dde2ea';
+  var holeFill  = isDark ? '#111418' : isWarm ? '#1a1208' : '#ffffff';
+  var emptyFill = isDark ? '#1e2530' : isWarm ? '#2c1f08' : '#dde2ea';
   if (pf.length === 0 || totalMkt <= 0) {
     ctx.beginPath(); ctx.arc(100,100,80,0,Math.PI*2); ctx.arc(100,100,50,Math.PI*2,0,true);
     ctx.fillStyle = emptyFill; ctx.fill();
@@ -228,7 +235,7 @@ function drawDonut(pf, totalMkt) {
   var angle = -Math.PI / 2, items = [];
   for (var i = 0; i < pf.length; i++) {
     var cp = curPrices[pf[i].ticker] || pf[i].pmc, val = pf[i].qty * cp;
-    var slice = (val / totalMkt) * Math.PI * 2, color = PALETTE[i % PALETTE.length];
+    var slice = (val / totalMkt) * Math.PI * 2, color = tickerColor(pf[i].ticker);
     ctx.beginPath(); ctx.arc(100,100,80,angle,angle+slice); ctx.arc(100,100,78,angle+slice,angle,true);
     ctx.closePath(); ctx.fillStyle = color; ctx.fill();
     items.push({ ticker: pf[i].ticker, color: color, pct: (val / totalMkt) * 100, val: val });
@@ -548,10 +555,10 @@ function renderHistChart() {
   var lo    = minV - range * 0.12;
   var hi    = maxV + range * 0.12;
 
-  var color     = isDark ? '#00d4a0' : '#00a878';
-  var gridColor = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
-  var textColor = isDark ? '#4d7490' : '#8099a8';
-  var bgColor   = isDark ? '#111418' : '#ffffff';
+  var color     = isDark ? '#00d4a0' : isWarm ? '#f59e0b' : '#00a878';
+  var gridColor = isDark ? 'rgba(255,255,255,0.07)' : isWarm ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.07)';
+  var textColor = isDark ? '#4d7490' : isWarm ? '#8a6830' : '#8099a8';
+  var bgColor   = isDark ? '#111418' : isWarm ? '#1a1208' : '#ffffff';
 
   function xp(i) { return PAD.left + (data.length > 1 ? (i / (data.length - 1)) * cw : cw / 2); }
   function yp(v) { return PAD.top + ch - ((v - lo) / (hi - lo)) * ch; }
@@ -580,7 +587,7 @@ function renderHistChart() {
 
   // Area fill gradient
   var grad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + ch);
-  grad.addColorStop(0,   isDark ? 'rgba(0,212,160,0.20)' : 'rgba(0,168,120,0.15)');
+  grad.addColorStop(0,   isDark ? 'rgba(0,212,160,0.20)' : isWarm ? 'rgba(245,158,11,0.18)' : 'rgba(0,168,120,0.15)');
   grad.addColorStop(1,   'rgba(0,0,0,0)');
 
   ctx.beginPath();

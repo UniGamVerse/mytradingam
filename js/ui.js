@@ -14,13 +14,20 @@ function showToast(msg, cls) {
 
 // ---------- Theme ----------
 function applyTheme() {
-  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  document.getElementById('theme-btn').textContent = isDark ? '☀ Light' : '☾ Dark';
+  var theme = isDark ? 'dark' : (isWarm ? 'warm' : 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+  var btn = document.getElementById('theme-btn');
+  if (theme === 'dark')  btn.textContent = '🟠 Warm';
+  if (theme === 'warm')  btn.textContent = '☀ Light';
+  if (theme === 'light') btn.textContent = '🌙 Dark';
   var t = totals(); drawDonut(t.pf, t.mkt);
+  if (typeof renderHistChart === 'function') renderHistChart();
 }
 function toggleTheme() {
-  isDark = !isDark;
-  try { localStorage.setItem('pd3_theme', isDark ? 'dark' : 'light'); } catch(e) {}
+  if (isDark)       { isDark = false; isWarm = true; }
+  else if (isWarm)  { isWarm = false; }
+  else              { isDark = true; }
+  try { localStorage.setItem('pd3_theme', isDark ? 'dark' : isWarm ? 'warm' : 'light'); } catch(e) {}
   applyTheme();
 }
 
@@ -183,6 +190,7 @@ function clearAll() {
   if (!confirm('Eliminare TUTTO il portafoglio?\n\nVerranno cancellate operazioni, fondi, alert e storico prezzi.\nQuesta operazione non è reversibile.')) return;
   ops = []; prices = {}; curPrices = {}; alertLog = []; alerts = {};
   fondi = []; fnMovs = []; fnNavs = {};
+  patrimonyHistory = [];
   save(); saveFondi();
   renderAll();
   showToast('Portafoglio azzerato ✓');
@@ -238,7 +246,9 @@ function simulate() {
 // ---------- Export / Import JSON ----------
 function buildSnapshot() {
   return { version: 1, title: portfolioTitle, exportedAt: new Date().toISOString(),
-           ops: ops, fondi: fondi, fnMovs: fnMovs, fnNavs: fnNavs, alerts: alerts, curPrices: curPrices };
+           ops: ops, fondi: fondi, fnMovs: fnMovs, fnNavs: fnNavs,
+           alerts: alerts, curPrices: curPrices,
+           patrimonyHistory: patrimonyHistory };
 }
 
 function exportJSON() {
@@ -266,8 +276,9 @@ function doImport() {
       fondi = snap.fondi || [];
       fnMovs = snap.fnMovs || [];
       fnNavs = snap.fnNavs || {};
-      alerts    = snap.alerts    || {};
-      curPrices = snap.curPrices || {};
+      alerts           = snap.alerts           || {};
+      curPrices        = snap.curPrices        || {};
+      patrimonyHistory = snap.patrimonyHistory || [];
       portfolioTitle = snap.title || '';
       save(); saveFondi();
       try { localStorage.setItem('pd3_title', portfolioTitle); } catch(e2) {}
@@ -318,7 +329,5 @@ function initSortableHeaders() {
   }
 }
 
-// Chiamata dopo il DOM ready
-document.addEventListener('DOMContentLoaded', function() {
-  initSortableHeaders();
-});
+// Chiamata diretta: i script sono sincroni a fine body, DOM già completo
+initSortableHeaders();
