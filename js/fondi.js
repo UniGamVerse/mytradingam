@@ -157,29 +157,6 @@ function editSub(id) {
   var mv = fnMovs.find(function(m){ return m.id === id; });
   if (!mv) return;
   var em = document.getElementById('modal-edit-sub');
-  if (!em) {
-    em = document.createElement('div');
-    em.id = 'modal-edit-sub';
-    em.className = 'modal-overlay';
-    em.innerHTML = [
-      '<div class="modal" style="min-width:340px;max-width:480px">',
-      '<div class="modal-hdr"><span class="modal-title">Modifica movimento fondo</span>',
-      '<button class="modal-close" onclick="closeEditSubModal()">✕</button></div>',
-      '<div class="modal-body" style="display:flex;flex-direction:column;gap:12px">',
-      '<div class="fg"><label>Fondo</label><select id="esub-fondo"></select></div>',
-      '<div class="fg"><label>Tipo</label><select id="esub-tipo"><option value="sub">Sottoscrizione</option><option value="rim">Rimborso</option></select></div>',
-      '<div class="fg"><label>Data</label><input id="esub-data" type="date"></div>',
-      '<div class="fg"><label>Quote</label><input id="esub-quote" type="number" step="any" placeholder="0.000"></div>',
-      '<div class="fg"><label>NAV (€)</label><input id="esub-nav" type="number" step="any" placeholder="0.0000"></div>',
-      '<div class="fg"><label>Commissioni (€)</label><input id="esub-comm" type="number" step="any" placeholder="0"></div>',
-      '<div class="fg"><label>Note <span style="color:var(--muted);font-size:10px;font-weight:400">(opzionale)</span></label><input id="esub-note" type="text" placeholder="es. piano accumulo, rimborso parziale..."></div>',
-      '</div>',
-      '<div class="modal-footer"><button class="btn btn-n" onclick="closeEditSubModal()">Annulla</button>',
-      '<button class="btn btn-g" onclick="saveEditSub()">Salva</button></div>',
-      '</div>'
-    ].join('');
-    document.body.appendChild(em);
-  }
   em._editId = id;
   populateFondoSelect('esub-fondo', mv.fondoId);
   document.getElementById('esub-tipo').value  = mv.tipo;
@@ -191,13 +168,11 @@ function editSub(id) {
   em.classList.add('open');
 }
 function closeEditSubModal() {
-  var em = document.getElementById('modal-edit-sub');
-  if (em) em.classList.remove('open');
+  document.getElementById('modal-edit-sub').classList.remove('open');
 }
 function saveEditSub() {
-  var em     = document.getElementById('modal-edit-sub');
-  var id     = em._editId;
-  var mv     = fnMovs.find(function(m){ return m.id === id; });
+  var em      = document.getElementById('modal-edit-sub');
+  var mv      = fnMovs.find(function(m){ return m.id === em._editId; });
   if (!mv) return;
   var fondoId = parseInt(document.getElementById('esub-fondo').value);
   var tipo    = document.getElementById('esub-tipo').value;
@@ -207,13 +182,9 @@ function saveEditSub() {
   var comm    = parseFloat(document.getElementById('esub-comm').value) || 0;
   var note    = document.getElementById('esub-note').value.trim();
   if (!fondoId || !data || isNaN(quote) || quote <= 0 || isNaN(nav) || nav <= 0) { alert('Compila tutti i campi obbligatori.'); return; }
-  mv.fondoId = fondoId;
-  mv.tipo    = tipo;
-  mv.data    = data;
-  mv.quote   = quote;
-  mv.nav     = nav;
-  mv.comm    = comm;
-  mv.note    = note || undefined;
+  mv.fondoId = fondoId; mv.tipo = tipo; mv.data = data;
+  mv.quote = quote; mv.nav = nav; mv.comm = comm;
+  mv.note = note || undefined;
   saveFondi(); closeEditSubModal(); renderFnPanel();
   if (typeof showToast === 'function') showToast('Movimento aggiornato ✓');
 }

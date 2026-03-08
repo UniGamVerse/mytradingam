@@ -191,31 +191,6 @@ function editOp(id) {
   var op = ops.find(function(o){ return o.id === id; });
   if (!op) return;
   var m = document.getElementById('modal-edit-op');
-  if (!m) {
-    // Crea il modal al volo se non esiste
-    m = document.createElement('div');
-    m.id = 'modal-edit-op';
-    m.className = 'modal-overlay';
-    m.innerHTML = [
-      '<div class="modal" style="min-width:340px;max-width:480px">',
-      '<div class="modal-hdr"><span class="modal-title">Modifica operazione</span>',
-      '<button class="modal-close" onclick="closeEditOpModal()">✕</button></div>',
-      '<div class="modal-body" style="display:flex;flex-direction:column;gap:12px">',
-      '<div class="fg"><label>Tipo</label>',
-      '<select id="eop-type"><option value="buy">Acquisto</option><option value="sell">Vendita</option><option value="split">Split</option></select></div>',
-      '<div class="fg"><label>Ticker</label><input id="eop-ticker" type="text" placeholder="es. AAPL"></div>',
-      '<div class="fg"><label>Data</label><input id="eop-date" type="date"></div>',
-      '<div class="fg" id="eop-qty-row"><label>Quantità / Rapporto</label><input id="eop-qty" type="number" step="any" placeholder="0"></div>',
-      '<div class="fg" id="eop-price-row"><label>Prezzo (€)</label><input id="eop-price" type="number" step="any" placeholder="0.00"></div>',
-      '<div class="fg" id="eop-comm-row"><label>Commissioni (€)</label><input id="eop-comm" type="number" step="any" placeholder="0"></div>',
-      '<div class="fg"><label>Note <span style="color:var(--muted);font-size:10px;font-weight:400">(opzionale)</span></label><input id="eop-note" type="text" placeholder="es. dividendo reinvestito, correzione..."></div>',
-      '</div>',
-      '<div class="modal-footer"><button class="btn btn-n" onclick="closeEditOpModal()">Annulla</button>',
-      '<button class="btn btn-g" onclick="saveEditOp()">Salva</button></div>',
-      '</div>'
-    ].join('');
-    document.body.appendChild(m);
-  }
   m._editId = id;
   document.getElementById('eop-type').value   = op.type;
   document.getElementById('eop-ticker').value = op.ticker;
@@ -224,25 +199,20 @@ function editOp(id) {
   document.getElementById('eop-price').value  = op.price;
   document.getElementById('eop-comm').value   = op.comm || 0;
   document.getElementById('eop-note').value   = op.note || '';
-  // Mostra/nasconde campi per split
-  var isSplit = op.type === 'split';
-  document.getElementById('eop-price-row').style.display = isSplit ? 'none' : '';
-  document.getElementById('eop-comm-row').style.display  = isSplit ? 'none' : '';
-  document.getElementById('eop-type').onchange = function() {
-    var s = this.value === 'split';
-    document.getElementById('eop-price-row').style.display = s ? 'none' : '';
-    document.getElementById('eop-comm-row').style.display  = s ? 'none' : '';
-  };
+  onEditOpTypeChange();
   m.classList.add('open');
 }
+function onEditOpTypeChange() {
+  var isSplit = document.getElementById('eop-type').value === 'split';
+  document.getElementById('eop-price-row').style.display = isSplit ? 'none' : '';
+  document.getElementById('eop-comm-row').style.display  = isSplit ? 'none' : '';
+}
 function closeEditOpModal() {
-  var m = document.getElementById('modal-edit-op');
-  if (m) m.classList.remove('open');
+  document.getElementById('modal-edit-op').classList.remove('open');
 }
 function saveEditOp() {
-  var m = document.getElementById('modal-edit-op');
-  var id     = m._editId;
-  var op     = ops.find(function(o){ return o.id === id; });
+  var m  = document.getElementById('modal-edit-op');
+  var op = ops.find(function(o){ return o.id === m._editId; });
   if (!op) return;
   var type   = document.getElementById('eop-type').value;
   var ticker = document.getElementById('eop-ticker').value.trim().toUpperCase();
@@ -253,16 +223,10 @@ function saveEditOp() {
   var note   = document.getElementById('eop-note').value.trim();
   if (!ticker || !date || isNaN(qty) || qty <= 0) { alert('Compila tutti i campi obbligatori.'); return; }
   if (type !== 'split' && (isNaN(price) || price <= 0)) { alert('Inserisci un prezzo valido.'); return; }
-  op.type   = type;
-  op.ticker = ticker;
-  op.date   = date;
-  op.qty    = qty;
-  op.price  = price;
-  op.comm   = comm;
-  op.note   = note || undefined;
-  save();
-  closeEditOpModal();
-  renderAll();
+  op.type = type; op.ticker = ticker; op.date = date;
+  op.qty = qty; op.price = price; op.comm = comm;
+  op.note = note || undefined;
+  save(); closeEditOpModal(); renderAll();
   showToast('Operazione aggiornata ✓');
 }
 function clearAll() {
