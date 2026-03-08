@@ -43,8 +43,11 @@ function getFondiPortfolio() {
     var qty = 0, cost = 0;
     for (var j = 0; j < d.lots.length; j++) { qty += d.lots[j].qty; cost += d.lots[j].qty * d.lots[j].nav; }
     if (qty < 0.00001 && d.realized === 0 && d.comm === 0) continue;
-    var navCorr = fnNavs[fd.id] || (qty > 0 ? cost / qty : 0);
-    res.push({ fondo: fd, qty: qty, navMedio: qty > 0 ? cost / qty : 0, cost: cost, navCorr: navCorr, realized: d.realized, comm: d.comm });
+    var navCorr = fnNavs[fd.id]
+      ? (typeof fnNavs[fd.id] === 'object' ? fnNavs[fd.id].val : fnNavs[fd.id])
+      : (qty > 0 ? cost / qty : 0);
+    var navDate = fnNavs[fd.id] && typeof fnNavs[fd.id] === 'object' ? fnNavs[fd.id].date : null;
+    res.push({ fondo: fd, qty: qty, navMedio: qty > 0 ? cost / qty : 0, cost: cost, navCorr: navCorr, navDate: navDate, realized: d.realized, comm: d.comm });
   }
   return res;
 }
@@ -243,11 +246,12 @@ function openNavModal() {
 function closeNavModal() { document.getElementById('fn-modal-nav').classList.remove('open'); }
 
 function saveNavs() {
+  var today  = new Date().toISOString().slice(0, 10);
   var inputs = document.querySelectorAll('#fn-nav-inputs input[data-fid]');
   for (var i = 0; i < inputs.length; i++) {
     var fid = parseInt(inputs[i].getAttribute('data-fid'));
     var v   = parseFloat(inputs[i].value);
-    if (!isNaN(v) && v > 0) fnNavs[fid] = v;
+    if (!isNaN(v) && v > 0) fnNavs[fid] = { val: v, date: today };
   }
   saveFondi(); closeNavModal(); renderFnPanel();
 }
@@ -297,7 +301,7 @@ function renderFnPanel() {
       var pl  = mv - p.cost;
       var plp = p.cost > 0 ? (pl / p.cost) * 100 : 0;
       var navStr = fnNavs[p.fondo.id]
-        ? '<strong>' + fe(p.navCorr) + '</strong><div style="font-size:9px;color:var(--g)">● aggiornato</div>'
+        ? '<strong>' + fe(p.navCorr) + '</strong><div style="font-size:9px;color:var(--g)">● ' + (p.navDate ? fmtDate(p.navDate) : 'aggiornato') + '</div>'
         : '<span class="dmc">' + fe(p.navCorr) + '</span><div style="font-size:9px;color:var(--muted)">= nav medio</div>';
       var cagrR = cagrFondo(p.fondo.id, p.cost, mv);
       rows += '<tr>';
