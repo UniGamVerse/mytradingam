@@ -22,6 +22,7 @@ function signInWithGoogle() {
   if (isSigningIn) return;
   isSigningIn = true;
   var provider = new firebase.auth.GoogleAuthProvider();
+  provider.addScope('https://www.googleapis.com/auth/drive.file');
   auth.signInWithPopup(provider).catch(function(e) {
     if (e.code !== 'auth/cancelled-popup-request' && e.code !== 'auth/popup-closed-by-user') {
       var el = document.getElementById('login-err');

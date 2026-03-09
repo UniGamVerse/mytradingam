@@ -185,17 +185,7 @@ function addOp() {
   renderAll(); fetchAll(false);
 }
 
-function delOp(id) {
-  var op = ops.find(function(o) { return o.id === id; });
-  if (!op) return;
-  if (op.type === 'split') {
-    if (!confirm('Eliminando questo split/raggruppamento le quantità e i prezzi delle operazioni precedenti verranno ripristinati. Continuare?')) return;
-    reverseSplit(op.ticker, op.qty, op.date);
-  }
-  ops = ops.filter(function(o) { return o.id !== id; });
-  save();
-  renderAll();
-}
+function delOp(id)  { ops = ops.filter(function(o){ return o.id !== id; }); save(); renderAll(); }
 
 function editOp(id) {
   var op = ops.find(function(o){ return o.id === id; });
@@ -233,25 +223,9 @@ function saveEditOp() {
   var note   = document.getElementById('eop-note').value.trim();
   if (!ticker || !date || isNaN(qty) || qty <= 0) { alert('Compila tutti i campi obbligatori.'); return; }
   if (type !== 'split' && (isNaN(price) || price <= 0)) { alert('Inserisci un prezzo valido.'); return; }
-  // Se era uno split e il ratio o la data è cambiata, inverte il vecchio e applica il nuovo
-  if (op.type === 'split' && type === 'split') {
-    var ratioChanged = op.qty !== qty;
-    var dateChanged  = op.date !== date;
-    var tickerChanged = op.ticker !== ticker;
-    if (ratioChanged || dateChanged || tickerChanged) {
-      reverseSplit(op.ticker, op.qty, op.date);
-      op.type = type; op.ticker = ticker; op.date = date;
-      op.qty = qty; op.price = 0; op.comm = 0;
-      op.note = note || '';
-      applySplit(ticker, qty, date);
-      save(); closeEditOpModal(); renderAll();
-      showToast('Split aggiornato ✓');
-      return;
-    }
-  }
   op.type = type; op.ticker = ticker; op.date = date;
   op.qty = qty; op.price = price; op.comm = comm;
-  op.note = note || '';
+  op.note = note || undefined;
   save(); closeEditOpModal(); renderAll();
   showToast('Operazione aggiornata ✓');
 }
@@ -320,13 +294,111 @@ function buildSnapshot() {
            patrimonyHistory: patrimonyHistory };
 }
 
+// ---------- Google Drive file ID persistente ----------
+var driveFileId = null;
+try { driveFileId = localStorage.getItem('pd3_drive_fid') || null; } catch(e) {}
+
 function exportJSON() {
   var snap = buildSnapshot();
   var name = (portfolioTitle || 'portfolio').replace(/[^a-zA-Z0-9_\-]/g,'_');
-  var blob = new Blob([JSON.stringify(snap, null, 2)], { type: 'application/json' });
+  var fileName = name + '_' + new Date().toISOString().slice(0,10) + '.json';
+  var jsonStr  = JSON.stringify(snap, null, 2);
+
+  // Prova prima a salvare su Drive se l'utente è loggato
+  if (currentUser) {
+    var cred = firebase.auth().currentUser;
+    // Recupera token OAuth Google (non Firebase) tramite getIdToken non basta,
+    // serve credential dal provider — usiamo re-auth silenzioso
+    firebase.auth().currentUser.getIdTokenResult().then(function() {
+      // Il token OAuth Drive è nella sessione del provider, lo recuperiamo
+      // tramite signInWithPopup silenzioso o dalla credential cached
+      saveToDrive(jsonStr, fileName);
+    }).catch(function() {
+      downloadJSON(jsonStr, fileName);
+    });
+  } else {
+    downloadJSON(jsonStr, fileName);
+  }
+}
+
+function saveToDrive(jsonStr, fileName) {
+  // Ottieni il token OAuth Google (scope drive.file) dalla sessione corrente
+  var provider = new firebase.auth.GoogleAuthProvider();
+  provider.addScope('https://www.googleapis.com/auth/drive.file');
+
+  auth.signInWithPopup(provider).then(function(result) {
+    var token = result.credential.accessToken;
+    var blob  = new Blob([jsonStr], { type: 'application/json' });
+
+    if (driveFileId) {
+      // Aggiorna file esistente (PATCH)
+      updateDriveFile(token, driveFileId, blob, fileName);
+    } else {
+      // Crea nuovo file (POST multipart)
+      createDriveFile(token, blob, fileName);
+    }
+  }).catch(function(e) {
+    if (e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') return;
+    console.error('Drive auth error:', e);
+    showToast('Drive non disponibile — scarico in locale', 'tr');
+    downloadJSON(jsonStr, fileName);
+  });
+}
+
+function createDriveFile(token, blob, fileName) {
+  var metadata = { name: fileName, mimeType: 'application/json', parents: [] };
+  var form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+  form.append('file', blob);
+
+  fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body: form
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data.id) {
+      driveFileId = data.id;
+      try { localStorage.setItem('pd3_drive_fid', driveFileId); } catch(e) {}
+      showToast('Salvato su Drive ✓');
+    } else {
+      throw new Error('no id');
+    }
+  }).catch(function(e) {
+    console.error('Drive create error:', e);
+    showToast('Errore Drive — scarico in locale', 'tr');
+    downloadJSON(jsonStr, fileName);
+  });
+}
+
+function updateDriveFile(token, fileId, blob, fileName) {
+  fetch('https://www.googleapis.com/upload/drive/v3/files/' + fileId + '?uploadType=media', {
+    method: 'PATCH',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json'
+    },
+    body: blob
+  }).then(function(r) {
+    if (r.status === 404) {
+      // File cancellato da Drive — ricrea
+      driveFileId = null;
+      try { localStorage.removeItem('pd3_drive_fid'); } catch(e) {}
+      createDriveFile(token, blob, fileName);
+      return;
+    }
+    showToast('Aggiornato su Drive ✓');
+  }).catch(function(e) {
+    console.error('Drive update error:', e);
+    showToast('Errore Drive — scarico in locale', 'tr');
+    downloadJSON(jsonStr, fileName);
+  });
+}
+
+function downloadJSON(jsonStr, fileName) {
+  var blob = new Blob([jsonStr], { type: 'application/json' });
   var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = name + '_' + new Date().toISOString().slice(0,10) + '.json'; a.click();
-  showToast('Backup salvato ✓');
+  a.download = fileName; a.click();
+  showToast('Backup scaricato ✓');
 }
 
 function openImport()  { document.getElementById('modal-import').classList.add('open'); document.getElementById('import-file').value = ''; }
