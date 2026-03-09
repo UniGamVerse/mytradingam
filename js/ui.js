@@ -194,7 +194,7 @@ function editOp(id) {
   m._editId = id;
   document.getElementById('eop-type').value   = op.type;
   document.getElementById('eop-ticker').value = op.ticker;
-  document.getElementById('eop-date').value   = op.date;
+  document.getElementById('eop-date-edit').value   = op.date;
   document.getElementById('eop-qty').value    = op.qty;
   document.getElementById('eop-price').value  = op.price;
   document.getElementById('eop-comm').value   = op.comm || 0;
@@ -216,7 +216,7 @@ function saveEditOp() {
   if (!op) return;
   var type   = document.getElementById('eop-type').value;
   var ticker = document.getElementById('eop-ticker').value.trim().toUpperCase();
-  var date   = document.getElementById('eop-date').value;
+  var date   = document.getElementById('eop-date-edit').value;
   var qty    = parseFloat(document.getElementById('eop-qty').value);
   var price  = type === 'split' ? 0 : parseFloat(document.getElementById('eop-price').value);
   var comm   = type === 'split' ? 0 : (parseFloat(document.getElementById('eop-comm').value) || 0);

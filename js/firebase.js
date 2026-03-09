@@ -119,11 +119,32 @@ function saveFondi() {
   saveTimer = setTimeout(saveToFirebase, 800);
 }
 
+// Rimuove campi undefined o con prefisso _ (calcolati dall'engine) prima del salvataggio
+function cleanForFirestore(arr) {
+  return arr.map(function(obj) {
+    var clean = {};
+    var keys = Object.keys(obj);
+    for (var i = 0; i < keys.length; i++) {
+      var k = obj[keys[i]];
+      if (keys[i][0] === '_') continue;          // salta campi calcolati _pl, _pmc, ecc.
+      if (k === undefined) continue;             // salta undefined
+      clean[keys[i]] = (k === null ? '' : k);   // null → stringa vuota
+    }
+    return clean;
+  });
+}
+
 function saveToFirebase() {
   if (!currentUser) return;
   var snap = {
-    ops: ops, curPrices: curPrices, alerts: alerts, alertLog: alertLog,
-    fondi: fondi, fnMovs: fnMovs, fnNavs: fnNavs, title: portfolioTitle,
+    ops: cleanForFirestore(ops),
+    curPrices: curPrices,
+    alerts: alerts,
+    alertLog: alertLog,
+    fondi: cleanForFirestore(fondi),
+    fnMovs: cleanForFirestore(fnMovs),
+    fnNavs: fnNavs,
+    title: portfolioTitle || '',
     patrimonyHistory: patrimonyHistory,
     updatedAt: new Date().toISOString()
   };
@@ -132,7 +153,7 @@ function saveToFirebase() {
   });
 }
 
-// Salva immediatamente prima che la pagina venga chiusa o nascosta
+// Salva immediatamente se la pagina viene chiusa o nascosta
 window.addEventListener('beforeunload', function() {
   if (saveTimer) { clearTimeout(saveTimer); saveToFirebase(); }
 });
