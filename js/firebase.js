@@ -106,7 +106,7 @@ function save() {
     localStorage.setItem('pd3_allog', JSON.stringify(alertLog));
   } catch(e) {}
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveToFirebase, 1500);
+  saveTimer = setTimeout(saveToFirebase, 800);
 }
 
 function saveFondi() {
@@ -116,7 +116,7 @@ function saveFondi() {
     localStorage.setItem('pd3_fnnav',  JSON.stringify(fnNavs));
   } catch(e) {}
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveToFirebase, 1500);
+  saveTimer = setTimeout(saveToFirebase, 800);
 }
 
 function saveToFirebase() {
@@ -131,3 +131,14 @@ function saveToFirebase() {
     console.error('Errore salvataggio Firebase:', e);
   });
 }
+
+// Salva immediatamente prima che la pagina venga chiusa o nascosta
+window.addEventListener('beforeunload', function() {
+  if (saveTimer) { clearTimeout(saveTimer); saveToFirebase(); }
+});
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'hidden' && saveTimer) {
+    clearTimeout(saveTimer);
+    saveToFirebase();
+  }
+});
