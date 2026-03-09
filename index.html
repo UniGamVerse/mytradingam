@@ -441,49 +441,6 @@
       <button class="btn btn-g" style="width:100%;margin-top:4px" onclick="saveNavs()">▶ Salva NAV</button>
     </div>
   </div>
-
-  <!-- Modal modifica operazione azioni -->
-  <div class="fn-modal" id="modal-edit-op">
-    <div class="fn-modal-box">
-      <button class="fn-close" onclick="closeEditOpModal()">✕</button>
-      <h3>Modifica operazione</h3>
-      <div class="fn-modal-grid">
-        <div class="fg"><label>Tipo</label>
-          <select id="eop-type" onchange="onEditOpTypeChange()">
-            <option value="buy">Acquisto</option>
-            <option value="sell">Vendita</option>
-            <option value="split">Split</option>
-          </select>
-        </div>
-        <div class="fg"><label>Ticker</label><input id="eop-ticker" type="text" placeholder="es. AAPL" style="text-transform:uppercase"></div>
-        <div class="fg"><label>Data</label><input id="eop-date" type="date"></div>
-        <div class="fg" id="eop-qty-row"><label>Quantità / Rapporto</label><input id="eop-qty" type="number" step="any" placeholder="0"></div>
-        <div class="fg" id="eop-price-row"><label>Prezzo (€)</label><input id="eop-price" type="number" step="any" placeholder="0.00"></div>
-        <div class="fg" id="eop-comm-row"><label>Commissioni (€)</label><input id="eop-comm" type="number" step="any" placeholder="0"></div>
-        <div class="fg full"><label>Note <span style="color:var(--muted);font-size:10px;font-weight:400">(opzionale)</span></label><input id="eop-note" type="text" placeholder="es. dividendo reinvestito, correzione..."></div>
-      </div>
-      <button class="btn btn-g" style="width:100%" onclick="saveEditOp()">▶ Salva modifiche</button>
-    </div>
-  </div>
-
-  <!-- Modal modifica movimento fondo -->
-  <div class="fn-modal" id="modal-edit-sub">
-    <div class="fn-modal-box">
-      <button class="fn-close" onclick="closeEditSubModal()">✕</button>
-      <h3>Modifica movimento fondo</h3>
-      <div class="fn-modal-grid">
-        <div class="fg full"><label>Fondo</label><select id="esub-fondo"></select></div>
-        <div class="fg"><label>Tipo</label><select id="esub-tipo"><option value="sub">Sottoscrizione</option><option value="rim">Rimborso</option></select></div>
-        <div class="fg"><label>Data</label><input id="esub-data" type="date"></div>
-        <div class="fg"><label>Quote</label><input id="esub-quote" type="number" step="any" placeholder="0.000"></div>
-        <div class="fg"><label>NAV (€/quota)</label><input id="esub-nav" type="number" step="any" placeholder="0.0000"></div>
-        <div class="fg"><label>Commissioni (€)</label><input id="esub-comm" type="number" step="any" placeholder="0"></div>
-        <div class="fg full"><label>Note <span style="color:var(--muted);font-size:10px;font-weight:400">(opzionale)</span></label><input id="esub-note" type="text" placeholder="es. piano accumulo, rimborso parziale..."></div>
-      </div>
-      <button class="btn btn-g" style="width:100%" onclick="saveEditSub()">▶ Salva modifiche</button>
-    </div>
-  </div>
-
   <div class="fn-nav">
     <button class="btn btn-g btn-sm" onclick="openFondoModal()">+ Nuovo fondo</button>
     <button class="btn btn-n btn-sm" onclick="openSubModal()">+ Movimento</button>
@@ -496,6 +453,13 @@
     <div class="kpi cr"><div class="kpi-l">P&amp;L Latente</div><div class="kpi-v" id="fn-kpi-unr">€ 0,00</div><div class="kpi-s" id="fn-kpi-unr-s">0,00%</div></div>
     <div class="kpi ca"><div class="kpi-l">P&amp;L Realizzato</div><div class="kpi-v" id="fn-kpi-rel">€ 0,00</div><div class="kpi-s">Da rimborsi chiusi</div></div>
     <div class="kpi cd"><div class="kpi-l">Comm. totali</div><div class="kpi-v" id="fn-kpi-comm" style="color:var(--tx)">€ 0,00</div><div class="kpi-s">Entrata + uscita</div></div>
+  </div>
+  <div class="tw" style="margin-bottom:16px">
+    <div class="th"><strong>Fondi registrati</strong><span id="fn-list-count">0 fondi</span></div>
+    <table>
+      <thead><tr><th>Nome</th><th>ISIN</th><th>Società</th><th>Categoria</th><th>Valuta</th><th></th></tr></thead>
+      <tbody id="fn-list-tbody"></tbody>
+    </table>
   </div>
   <div class="tw" style="margin-bottom:16px">
     <div class="th"><strong>Posizioni aperte</strong><span>NAV aggiornato manualmente</span></div>

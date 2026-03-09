@@ -246,12 +246,11 @@ function openNavModal() {
 function closeNavModal() { document.getElementById('fn-modal-nav').classList.remove('open'); }
 
 function saveNavs() {
-  var today  = new Date().toISOString().slice(0, 10);
   var inputs = document.querySelectorAll('#fn-nav-inputs input[data-fid]');
   for (var i = 0; i < inputs.length; i++) {
     var fid = parseInt(inputs[i].getAttribute('data-fid'));
     var v   = parseFloat(inputs[i].value);
-    if (!isNaN(v) && v > 0) fnNavs[fid] = { val: v, date: today };
+    if (!isNaN(v) && v > 0) fnNavs[fid] = { val: v, date: new Date().toISOString().slice(0, 10) };
   }
   saveFondi(); closeNavModal(); renderFnPanel();
 }
@@ -286,6 +285,30 @@ function renderFnPanel() {
   document.getElementById('fn-kpi-unr-s').textContent = fp(unrPct);
   var fr = document.getElementById('fn-kpi-rel'); fr.textContent = fe(totalRel); fr.className = 'kpi-v ' + cc(totalRel);
   document.getElementById('fn-kpi-comm').textContent  = fe(totalComm);
+
+  // Elenco fondi registrati
+  var ltb = document.getElementById('fn-list-tbody');
+  var catLabel = { azionario:'Azionario', obbligazionario:'Obbligaz.', bilanciato:'Bilanciato', monetario:'Monetario', flessibile:'Flessibile', altro:'Altro' };
+  document.getElementById('fn-list-count').textContent = fondi.length + (fondi.length === 1 ? ' fondo' : ' fondi');
+  if (fondi.length === 0) {
+    ltb.innerHTML = '<tr><td colspan="6" class="empty">Nessun fondo registrato · clicca "+ Nuovo fondo" per aggiungerne uno</td></tr>';
+  } else {
+    var lrows = '';
+    for (var i = 0; i < fondi.length; i++) {
+      var fd = fondi[i];
+      lrows += '<tr>';
+      lrows += '<td style="font-weight:600;font-size:11px">' + fd.nome + '</td>';
+      lrows += '<td><span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.04em">' + fd.isin + '</span></td>';
+      lrows += '<td style="font-size:10px;color:var(--dim)">' + (fd.societa || '—') + '</td>';
+      lrows += '<td><span class="tag" style="background:var(--bld);color:var(--bl)">' + (catLabel[fd.cat] || fd.cat || '—') + '</span></td>';
+      lrows += '<td style="font-size:10px;color:var(--dim)">' + (fd.valuta || 'EUR') + '</td>';
+      lrows += '<td style="white-space:nowrap">';
+      lrows += '<button class="btn btn-n btn-sm" style="padding:2px 7px;margin-right:3px" onclick="openFondoModal(' + fd.id + ')">✎</button>';
+      lrows += '<button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delFondo(' + fd.id + ')">🗑</button>';
+      lrows += '</td></tr>';
+    }
+    ltb.innerHTML = lrows;
+  }
 
   // Posizioni aperte
   var ptb = document.getElementById('fn-pos-tbody');
