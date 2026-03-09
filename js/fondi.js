@@ -193,7 +193,7 @@ function saveEditSub() {
   mv.quote   = quote;
   mv.nav     = nav;
   mv.comm    = comm;
-  mv.note    = note || undefined;
+  mv.note    = note || '';
   saveFondi(); closeEditSubModal(); renderFnPanel();
   if (typeof showToast === 'function') showToast('Movimento aggiornato ✓');
 }

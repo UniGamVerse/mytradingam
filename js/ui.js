@@ -225,7 +225,7 @@ function saveEditOp() {
   if (type !== 'split' && (isNaN(price) || price <= 0)) { alert('Inserisci un prezzo valido.'); return; }
   op.type = type; op.ticker = ticker; op.date = date;
   op.qty = qty; op.price = price; op.comm = comm;
-  op.note = note || undefined;
+  op.note = note || '';
   save(); closeEditOpModal(); renderAll();
   showToast('Operazione aggiornata ✓');
 }
