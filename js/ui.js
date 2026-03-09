@@ -3,7 +3,9 @@
 // ============================================================
 
 // ---------- Toast ----------
-var toastTimer = null;
+var toastTimer  = null;
+var driveFileId = null;
+try { driveFileId = localStorage.getItem('pd3_drive_fid') || null; } catch(e) {}
 function showToast(msg, cls) {
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -294,59 +296,30 @@ function buildSnapshot() {
            patrimonyHistory: patrimonyHistory };
 }
 
-// ---------- Google Drive file ID persistente ----------
-var driveFileId = null;
-try { driveFileId = localStorage.getItem('pd3_drive_fid') || null; } catch(e) {}
-
 function exportJSON() {
   var snap = buildSnapshot();
   var name = (portfolioTitle || 'portfolio').replace(/[^a-zA-Z0-9_\-]/g,'_');
   var fileName = name + '_' + new Date().toISOString().slice(0,10) + '.json';
   var jsonStr  = JSON.stringify(snap, null, 2);
 
-  // Prova prima a salvare su Drive se l'utente è loggato
-  if (currentUser) {
-    var cred = firebase.auth().currentUser;
-    // Recupera token OAuth Google (non Firebase) tramite getIdToken non basta,
-    // serve credential dal provider — usiamo re-auth silenzioso
-    firebase.auth().currentUser.getIdTokenResult().then(function() {
-      // Il token OAuth Drive è nella sessione del provider, lo recuperiamo
-      // tramite signInWithPopup silenzioso o dalla credential cached
-      saveToDrive(jsonStr, fileName);
-    }).catch(function() {
-      downloadJSON(jsonStr, fileName);
-    });
+  if (currentUser && driveToken) {
+    saveToDrive(jsonStr, fileName);
   } else {
     downloadJSON(jsonStr, fileName);
   }
 }
 
 function saveToDrive(jsonStr, fileName) {
-  // Ottieni il token OAuth Google (scope drive.file) dalla sessione corrente
-  var provider = new firebase.auth.GoogleAuthProvider();
-  provider.addScope('https://www.googleapis.com/auth/drive.file');
-
-  auth.signInWithPopup(provider).then(function(result) {
-    var token = result.credential.accessToken;
-    var blob  = new Blob([jsonStr], { type: 'application/json' });
-
-    if (driveFileId) {
-      // Aggiorna file esistente (PATCH)
-      updateDriveFile(token, driveFileId, blob, fileName);
-    } else {
-      // Crea nuovo file (POST multipart)
-      createDriveFile(token, blob, fileName);
-    }
-  }).catch(function(e) {
-    if (e.code === 'auth/cancelled-popup-request' || e.code === 'auth/popup-closed-by-user') return;
-    console.error('Drive auth error:', e);
-    showToast('Drive non disponibile — scarico in locale', 'tr');
-    downloadJSON(jsonStr, fileName);
-  });
+  var blob = new Blob([jsonStr], { type: 'application/json' });
+  if (driveFileId) {
+    updateDriveFile(driveToken, driveFileId, blob, jsonStr, fileName);
+  } else {
+    createDriveFile(driveToken, blob, jsonStr, fileName);
+  }
 }
 
-function createDriveFile(token, blob, fileName) {
-  var metadata = { name: fileName, mimeType: 'application/json', parents: [] };
+function createDriveFile(token, blob, jsonStr, fileName) {
+  var metadata = { name: fileName, mimeType: 'application/json' };
   var form = new FormData();
   form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
   form.append('file', blob);
@@ -355,13 +328,16 @@ function createDriveFile(token, blob, fileName) {
     method: 'POST',
     headers: { 'Authorization': 'Bearer ' + token },
     body: form
-  }).then(function(r) { return r.json(); }).then(function(data) {
+  }).then(function(r) {
+    if (r.status === 401) { driveToken = null; try { localStorage.removeItem('pd3_drive_token'); } catch(e) {} throw new Error('token scaduto'); }
+    return r.json();
+  }).then(function(data) {
     if (data.id) {
       driveFileId = data.id;
       try { localStorage.setItem('pd3_drive_fid', driveFileId); } catch(e) {}
       showToast('Salvato su Drive ✓');
     } else {
-      throw new Error('no id');
+      throw new Error('no id: ' + JSON.stringify(data));
     }
   }).catch(function(e) {
     console.error('Drive create error:', e);
@@ -370,7 +346,7 @@ function createDriveFile(token, blob, fileName) {
   });
 }
 
-function updateDriveFile(token, fileId, blob, fileName) {
+function updateDriveFile(token, fileId, blob, jsonStr, fileName) {
   fetch('https://www.googleapis.com/upload/drive/v3/files/' + fileId + '?uploadType=media', {
     method: 'PATCH',
     headers: {
@@ -380,10 +356,16 @@ function updateDriveFile(token, fileId, blob, fileName) {
     body: blob
   }).then(function(r) {
     if (r.status === 404) {
-      // File cancellato da Drive — ricrea
       driveFileId = null;
       try { localStorage.removeItem('pd3_drive_fid'); } catch(e) {}
-      createDriveFile(token, blob, fileName);
+      createDriveFile(token, blob, jsonStr, fileName);
+      return;
+    }
+    if (r.status === 401) {
+      driveToken = null;
+      try { localStorage.removeItem('pd3_drive_token'); } catch(e) {}
+      showToast('Token Drive scaduto — rieffettua il login', 'tr');
+      downloadJSON(jsonStr, fileName);
       return;
     }
     showToast('Aggiornato su Drive ✓');

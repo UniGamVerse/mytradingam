@@ -12,7 +12,9 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 var db = firebase.firestore();
 var auth = firebase.auth();
-var currentUser = null;
+var currentUser    = null;
+var driveToken     = null;  // accessToken Google OAuth con scope drive.file
+try { driveToken = localStorage.getItem('pd3_drive_token') || null; } catch(e) {}
 var saveTimer  = null;
 var saveFondiTimer = null;   // timer separato per fondi
 
@@ -23,7 +25,12 @@ function signInWithGoogle() {
   isSigningIn = true;
   var provider = new firebase.auth.GoogleAuthProvider();
   provider.addScope('https://www.googleapis.com/auth/drive.file');
-  auth.signInWithPopup(provider).catch(function(e) {
+  auth.signInWithPopup(provider).then(function(result) {
+    if (result.credential) {
+      driveToken = result.credential.accessToken;
+      try { localStorage.setItem('pd3_drive_token', driveToken); } catch(e) {}
+    }
+  }).catch(function(e) {
     if (e.code !== 'auth/cancelled-popup-request' && e.code !== 'auth/popup-closed-by-user') {
       var el = document.getElementById('login-err');
       el.textContent = 'Errore: ' + e.message;
