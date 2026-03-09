@@ -301,8 +301,8 @@ function renderFnPanel() {
       var pl  = mv - p.cost;
       var plp = p.cost > 0 ? (pl / p.cost) * 100 : 0;
       var navStr = fnNavs[p.fondo.id]
-        ? '<strong>' + fe4(p.navCorr) + '</strong><div style="font-size:9px;color:var(--g)">● ' + (p.navDate ? fmtDate(p.navDate) : 'aggiornato') + '</div>'
-        : '<span class="dmc">' + fe4(p.navCorr) + '</span><div style="font-size:9px;color:var(--muted)">= nav medio</div>';
+        ? '<strong>' + fe(p.navCorr) + '</strong><div style="font-size:9px;color:var(--g)">● ' + (p.navDate ? fmtDate(p.navDate) : 'aggiornato') + '</div>'
+        : '<span class="dmc">' + fe(p.navCorr) + '</span><div style="font-size:9px;color:var(--muted)">= nav medio</div>';
       var cagrR = cagrFondo(p.fondo.id, p.cost, mv);
       rows += '<tr>';
       rows += '<td><div style="font-weight:700;color:var(--tx);font-size:11px">' + p.fondo.nome + '</div>';
@@ -311,7 +311,7 @@ function renderFnPanel() {
       rows += '<td><span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.04em">' + p.fondo.isin + '</span></td>';
       rows += '<td><span class="tag" style="background:var(--bld);color:var(--bl)">' + (catLabel[p.fondo.cat] || p.fondo.cat) + '</span></td>';
       rows += '<td>' + f(p.qty, 3) + '</td>';
-      rows += '<td class="dmc">' + fe4(p.navMedio) + '</td>';
+      rows += '<td class="dmc">' + fe(p.navMedio) + '</td>';
       rows += '<td>' + navStr + '</td>';
       rows += '<td>' + fe(mv) + '</td>';
       rows += '<td><span class="' + cc(pl) + '">' + fe(pl) + '</span></td>';
@@ -326,6 +326,27 @@ function renderFnPanel() {
   // Log movimenti
   var ltb    = document.getElementById('fn-log-tbody');
   var sorted = fnMovs.slice().sort(function(a,b){ return b.data < a.data ? -1 : 1; });
+
+  // Popola select fondi
+  var sel = document.getElementById('fn-log-filter');
+  var curF = sel ? sel.value : '';
+  if (sel) {
+    var fondoIds = [];
+    for (var fi = 0; fi < fnMovs.length; fi++) {
+      if (fondoIds.indexOf(fnMovs[fi].fondoId) === -1) fondoIds.push(fnMovs[fi].fondoId);
+    }
+    var fopts = '<option value="">Tutti i fondi</option>';
+    for (var fj = 0; fj < fondoIds.length; fj++) {
+      var fnd = fondi.find(function(x){ return x.id === fondoIds[fj]; });
+      var fnm = fnd ? fnd.nome : fondoIds[fj];
+      fopts += '<option value="' + fondoIds[fj] + '"' + (fondoIds[fj] === curF ? ' selected' : '') + '>' + fnm + '</option>';
+    }
+    sel.innerHTML = fopts;
+  }
+
+  // Filtra se selezionato
+  if (curF) sorted = sorted.filter(function(m){ return m.fondoId === curF; });
+
   document.getElementById('fn-log-count').textContent = sorted.length + ' movimenti';
   if (sorted.length === 0) { ltb.innerHTML = '<tr><td colspan="8" class="empty">Nessun movimento</td></tr>'; }
   else {
@@ -340,7 +361,7 @@ function renderFnPanel() {
       lrows += '<td class="dmc">' + fmtDate(m.data) + '</td>';
       lrows += '<td><span class="tag ' + (isSub ? 'buy' : 'sell') + '">' + (isSub ? '▲ SUB' : '▼ RIM') + '</span></td>';
       lrows += '<td style="max-width:200px;white-space:normal;font-size:10px">' + fdName + '</td>';
-      lrows += '<td>' + f(m.quote, 3) + '</td><td>' + fe4(m.nav) + '</td><td>' + fe(m.quote * m.nav) + '</td>';
+      lrows += '<td>' + f(m.quote, 3) + '</td><td>' + fe(m.nav) + '</td><td>' + fe(m.quote * m.nav) + '</td>';
       var noteHtml = m.note ? '<span title="' + m.note.replace(/"/g,'&quot;') + '" style="cursor:default;color:var(--au);font-size:11px">💬</span>' : '';
       lrows += '<td class="dmc">' + fe(m.comm) + '</td><td>' + plHtml + ' ' + noteHtml + '</td>';
       lrows += '<td style="white-space:nowrap"><button class="btn btn-n btn-sm" style="padding:2px 7px;margin-right:3px" onclick="editSub(' + m.id + ')">✎</button><button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delSub(' + m.id + ')">🗑</button></td>';

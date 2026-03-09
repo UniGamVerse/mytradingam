@@ -109,7 +109,7 @@ function renderTtPanel() {
     var cagrR = cagrForPosition(p.ticker, p.cost, mv);
     rows += '<tr><td><span class="tag buy">▪ AZ</span></td>' + tkCellSm(p.ticker);
     rows += '<td class="dmc">—</td><td class="dmc">' + f(p.qty, p.qty%1===0?0:3) + '</td>';
-    rows += '<td class="dmc">' + fe4(p.pmc) + '</td><td><strong>' + fe4(cp) + '</strong></td>';
+    rows += '<td class="dmc">' + fe(p.pmc) + '</td><td><strong>' + fe(cp) + '</strong></td>';
     rows += '<td>' + fe(mv) + '</td><td><span class="' + cc(pl) + '">' + fe(pl) + '</span></td>';
     rows += '<td><span class="' + cc(plp) + '">' + fp(plp) + '</span></td>';
     rows += '<td>' + fmtCAGR(cagrR ? cagrR.cagr : null, cagrR ? cagrR.years : null) + '</td></tr>';
@@ -120,8 +120,8 @@ function renderTtPanel() {
     var cagrR = cagrFondo(p.fondo.id, p.cost, mv);
     rows += '<tr><td><span class="tag" style="background:var(--bld);color:var(--ac)">◈ FD</span></td>';
     rows += '<td>' + p.fondo.nome + '</td><td class="dmc">' + p.fondo.isin + '</td>';
-    rows += '<td class="dmc">' + f(p.qty, 3) + '</td><td class="dmc">' + fe4(p.navMedio) + '</td>';
-    rows += '<td>' + fe4(p.navCorr) + (fnNavs[p.fondo.id] ? ' <span style="color:var(--g)">●</span>' : '') + '</td>';
+    rows += '<td class="dmc">' + f(p.qty, 3) + '</td><td class="dmc">' + fe(p.navMedio) + '</td>';
+    rows += '<td>' + fe(p.navCorr) + (fnNavs[p.fondo.id] ? ' <span style="color:var(--g)">●</span>' : '') + '</td>';
     rows += '<td>' + fe(mv) + '</td><td><span class="' + cc(pl) + '">' + fe(pl) + '</span></td>';
     rows += '<td><span class="' + cc(plp) + '">' + fp(plp) + '</span></td>';
     rows += '<td>' + fmtCAGR(cagrR ? cagrR.cagr : null, cagrR ? cagrR.years : null) + '</td></tr>';
@@ -195,7 +195,7 @@ function renderOvPanel() {
       var ovCagr   = cagrForPosition(p.ticker, p.cost, mv);
       rows += '<tr><td><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' + col + '"></span></td>';
       rows += tkCellSm(p.ticker) + '<td class="dmc">' + f(p.qty, p.qty % 1 === 0 ? 0 : 3) + '</td>';
-      rows += '<td class="dmc">' + fe4(p.pmc) + '</td><td><strong>' + fe4(cp) + '</strong></td>';
+      rows += '<td class="dmc">' + fe(p.pmc) + '</td><td><strong>' + fe(cp) + '</strong></td>';
       rows += '<td>' + fe(mv) + '</td><td><span class="' + cc(pl) + '">' + fe(pl) + '</span></td>';
       rows += '<td><span class="' + cc(plp) + '">' + fp(plp) + '</span></td>';
       rows += '<td>' + fmtCAGR(ovCagr ? ovCagr.cagr : null, ovCagr ? ovCagr.years : null) + '</td>';
@@ -214,7 +214,7 @@ function renderOvPanel() {
       var plHtml = (op.type === 'sell' && op._pl !== undefined) ? '<span class="' + cc(op._pl) + '">' + fe(op._pl) + '</span>' : '<span class="dmc">—</span>';
       rrows += '<tr><td class="dmc">' + fmtDate(op.date) + '</td><td><span class="tag ' + op.type + '">' + (op.type === 'buy' ? '▲ ACQ' : op.type === 'split' ? '⇄ SPLIT' : '▼ VEN') + '</span></td>';
       rrows += tkCellSm(op.ticker) + '<td class="dmc">' + f(op.qty, op.qty % 1 === 0 ? 0 : 4) + '</td>';
-      rrows += '<td>' + fe4(op.price) + '</td><td>' + fe(ctv) + '</td><td>' + plHtml + '</td></tr>';
+      rrows += '<td>' + fe(op.price) + '</td><td>' + fe(ctv) + '</td><td>' + plHtml + '</td></tr>';
     }
     rb.innerHTML = rrows;
   }
@@ -263,7 +263,7 @@ function renderOpPanel() {
     var plHtml = (op.type === 'sell' && op._pl !== undefined) ? '<span class="' + cc(op._pl) + '">' + fe(op._pl) + '</span>' : '<span class="dmc">—</span>';
     var opTag1   = op.type==='split' ? '<span class="tag" style="background:var(--aud);color:var(--au)">⇄ SPLIT</span>' : '<span class="tag ' + op.type + '">' + (op.type==='buy'?'▲ ACQ':'▼ VEN') + '</span>';
     var opQty1   = op.type==='split' ? 'x' + op.qty : f(op.qty, op.qty%1===0?0:4);
-    var opPrice1 = op.type==='split' ? '<span class="dmc">—</span>' : fe4(op.price);
+    var opPrice1 = op.type==='split' ? '<span class="dmc">—</span>' : fe(op.price);
     var opCtv1   = op.type==='split' ? '<span class="dmc">—</span>' : fe(op.qty*op.price);
     rows += '<tr><td class="dmc">' + fmtDate(op.date) + '</td><td>' + opTag1 + '</td>';
     rows += tkCellSm(op.ticker) + '<td>' + opQty1 + '</td><td>' + opPrice1 + '</td>';
@@ -276,6 +276,26 @@ function renderOpPanel() {
 // ---------- Log ----------
 function renderLogPanel() {
   var sorted = ops.slice().sort(function(a,b){ return b.date < a.date ? -1 : 1; });
+
+  // Popola select ticker
+  var sel = document.getElementById('lg-filter');
+  var cur = sel ? sel.value : '';
+  if (sel) {
+    var tickers = [];
+    for (var k = 0; k < ops.length; k++) {
+      if (tickers.indexOf(ops[k].ticker) === -1) tickers.push(ops[k].ticker);
+    }
+    tickers.sort();
+    var opts = '<option value="">Tutti i ticker</option>';
+    for (var t = 0; t < tickers.length; t++) {
+      opts += '<option value="' + tickers[t] + '"' + (tickers[t] === cur ? ' selected' : '') + '>' + tickers[t] + '</option>';
+    }
+    sel.innerHTML = opts;
+  }
+
+  // Filtra se selezionato
+  if (cur) sorted = sorted.filter(function(o){ return o.ticker === cur; });
+
   var tb = document.getElementById('lg-tbody');
   if (sorted.length === 0) { tb.innerHTML = '<tr><td colspan="10" class="empty-state"><div class="es-icon">📋</div><div class="es-title">Log vuoto</div><div class="es-sub">Tutte le operazioni registrate appariranno qui in ordine cronologico</div><br><button class="btn btn-g btn-sm" style="margin-top:10px" onclick="goTab(\'op\')">+ Prima operazione</button></td></tr>'; return; }
   var rows = '';
@@ -353,7 +373,7 @@ function renderPfPanel() {
       chgCell   = '<span class="dmc">—</span>';
     }
     rows += '<tr id="row-' + p.ticker + '">' + tkCell(p.ticker);
-    rows += '<td>' + f(p.qty,p.qty%1===0?0:4) + '</td><td>' + fe4(p.pmc) + '</td><td>' + priceCell + '</td><td>' + chgCell + '</td>';
+    rows += '<td>' + f(p.qty,p.qty%1===0?0:4) + '</td><td>' + fe(p.pmc) + '</td><td>' + priceCell + '</td><td>' + chgCell + '</td>';
     rows += '<td>' + fe(mv) + '</td><td><span class="' + cc(pl) + '">' + fe(pl) + '</span></td><td><span class="' + cc(plp) + '">' + fp(plp) + '</span></td>';
     var cagrRes = cagrForPosition(p.ticker, p.cost, mv);
     rows += '<td>' + fmtCAGR(cagrRes ? cagrRes.cagr : null, cagrRes ? cagrRes.years : null) + '</td>';
@@ -464,7 +484,7 @@ function renderAlPanel() {
       var al = alerts[p.ticker] || { target: null, stop: null };
       var status = getAlertStatus(p.ticker, cp);
       html += '<div class="alert-card">';
-      html += '<h4><span class="tkb">' + p.ticker + '</span> &nbsp; <span class="dmc" style="font-family:var(--mono);font-size:11px">Prezzo: ' + fe4(cp) + '</span> &nbsp;' + status + '</h4>';
+      html += '<h4><span class="tkb">' + p.ticker + '</span> &nbsp; <span class="dmc" style="font-family:var(--mono);font-size:11px">Prezzo: ' + fe(cp) + '</span> &nbsp;' + status + '</h4>';
       html += '<div class="alert-row"><label>Target €</label><input type="number" step="any" placeholder="es. 25.00" value="' + (al.target || '') + '" onchange="setAlert(\'' + p.ticker + '\',\'target\',this.value)" onfocus="this.style.borderColor=\'var(--g)\'" onblur="this.style.borderColor=\'var(--b2)\'"><span style="font-size:10px;color:var(--dim)">↑ notifica se sale sopra</span></div>';
       html += '<div class="alert-row"><label>Stop €</label><input type="number" step="any" placeholder="es. 18.00" value="' + (al.stop || '') + '" onchange="setAlert(\'' + p.ticker + '\',\'stop\',this.value)" onfocus="this.style.borderColor=\'var(--r)\'" onblur="this.style.borderColor=\'var(--b2)\'"><span style="font-size:10px;color:var(--dim)">↓ notifica se scende sotto</span></div>';
       html += '</div>';

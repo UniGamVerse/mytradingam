@@ -62,7 +62,6 @@
         <div class="badge loading" id="pbadge">⟳ attesa</div>
       </div>
       <div style="font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace" id="lupd">—</div>
-      <div style="font-size:10px;font-family:'JetBrains Mono',monospace;min-height:14px" id="save-status"></div>
     </span>
   </div>
   <div class="hstats">
@@ -280,7 +279,8 @@
   <div class="tw">
     <div class="th">
       <strong>Log completo</strong>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="lg-filter" onchange="renderLogPanel()" style="font-size:11px;padding:3px 6px;border-radius:4px;border:1px solid var(--b2);background:var(--b1);color:var(--tx);cursor:pointer"><option value="">Tutti i ticker</option></select>
         <button class="btn btn-n btn-sm" onclick="exportCSV()">↓ CSV</button>
         <button class="btn btn-n btn-sm" style="color:var(--r)" onclick="clearAll()">✕ Reset</button>
       </div>
@@ -470,7 +470,7 @@
     </table>
   </div>
   <div class="tw">
-    <div class="th"><strong>Log movimenti</strong><span id="fn-log-count">0 movimenti</span></div>
+    <div class="th"><strong>Log movimenti</strong><div style="display:flex;gap:8px;align-items:center"><select id="fn-log-filter" onchange="renderFnPanel()" style="font-size:11px;padding:3px 6px;border-radius:4px;border:1px solid var(--b2);background:var(--b1);color:var(--tx);cursor:pointer"><option value="">Tutti i fondi</option></select><span id="fn-log-count">0 movimenti</span></div></div>
     <table>
       <thead><tr><th>Data</th><th>Tipo</th><th>Fondo</th><th>Quote</th><th>NAV</th><th>Controv.</th><th>Comm.</th><th>P&amp;L</th><th></th></tr></thead>
       <tbody id="fn-log-tbody"></tbody>
