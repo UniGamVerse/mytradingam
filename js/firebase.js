@@ -15,12 +15,20 @@ var auth = firebase.auth();
 var currentUser = null;
 var saveTimer = null;
 
+var isSigningIn = false;
+
 function signInWithGoogle() {
+  if (isSigningIn) return;
+  isSigningIn = true;
   var provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(function(e) {
-    var el = document.getElementById('login-err');
-    el.textContent = 'Errore: ' + e.message;
-    el.style.display = 'block';
+    if (e.code !== 'auth/cancelled-popup-request' && e.code !== 'auth/popup-closed-by-user') {
+      var el = document.getElementById('login-err');
+      el.textContent = 'Errore: ' + e.message;
+      el.style.display = 'block';
+    }
+  }).finally(function() {
+    isSigningIn = false;
   });
 }
 
