@@ -193,7 +193,7 @@ function saveEditSub() {
   mv.quote   = quote;
   mv.nav     = nav;
   mv.comm    = comm;
-  mv.note    = note || '';
+  mv.note    = note || undefined;
   saveFondi(); closeEditSubModal(); renderFnPanel();
   if (typeof showToast === 'function') showToast('Movimento aggiornato ✓');
 }
@@ -301,8 +301,8 @@ function renderFnPanel() {
       var pl  = mv - p.cost;
       var plp = p.cost > 0 ? (pl / p.cost) * 100 : 0;
       var navStr = fnNavs[p.fondo.id]
-        ? '<strong>' + fe(p.navCorr) + '</strong><div style="font-size:9px;color:var(--g)">● ' + (p.navDate ? fmtDate(p.navDate) : 'aggiornato') + '</div>'
-        : '<span class="dmc">' + fe(p.navCorr) + '</span><div style="font-size:9px;color:var(--muted)">= nav medio</div>';
+        ? '<strong>' + fe4(p.navCorr) + '</strong><div style="font-size:9px;color:var(--g)">● ' + (p.navDate ? fmtDate(p.navDate) : 'aggiornato') + '</div>'
+        : '<span class="dmc">' + fe4(p.navCorr) + '</span><div style="font-size:9px;color:var(--muted)">= nav medio</div>';
       var cagrR = cagrFondo(p.fondo.id, p.cost, mv);
       rows += '<tr>';
       rows += '<td><div style="font-weight:700;color:var(--tx);font-size:11px">' + p.fondo.nome + '</div>';
@@ -311,7 +311,7 @@ function renderFnPanel() {
       rows += '<td><span style="font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:.04em">' + p.fondo.isin + '</span></td>';
       rows += '<td><span class="tag" style="background:var(--bld);color:var(--bl)">' + (catLabel[p.fondo.cat] || p.fondo.cat) + '</span></td>';
       rows += '<td>' + f(p.qty, 3) + '</td>';
-      rows += '<td class="dmc">' + fe(p.navMedio) + '</td>';
+      rows += '<td class="dmc">' + fe4(p.navMedio) + '</td>';
       rows += '<td>' + navStr + '</td>';
       rows += '<td>' + fe(mv) + '</td>';
       rows += '<td><span class="' + cc(pl) + '">' + fe(pl) + '</span></td>';
@@ -340,7 +340,7 @@ function renderFnPanel() {
       lrows += '<td class="dmc">' + fmtDate(m.data) + '</td>';
       lrows += '<td><span class="tag ' + (isSub ? 'buy' : 'sell') + '">' + (isSub ? '▲ SUB' : '▼ RIM') + '</span></td>';
       lrows += '<td style="max-width:200px;white-space:normal;font-size:10px">' + fdName + '</td>';
-      lrows += '<td>' + f(m.quote, 3) + '</td><td>' + fe(m.nav) + '</td><td>' + fe(m.quote * m.nav) + '</td>';
+      lrows += '<td>' + f(m.quote, 3) + '</td><td>' + fe4(m.nav) + '</td><td>' + fe(m.quote * m.nav) + '</td>';
       var noteHtml = m.note ? '<span title="' + m.note.replace(/"/g,'&quot;') + '" style="cursor:default;color:var(--au);font-size:11px">💬</span>' : '';
       lrows += '<td class="dmc">' + fe(m.comm) + '</td><td>' + plHtml + ' ' + noteHtml + '</td>';
       lrows += '<td style="white-space:nowrap"><button class="btn btn-n btn-sm" style="padding:2px 7px;margin-right:3px" onclick="editSub(' + m.id + ')">✎</button><button class="btn btn-n btn-sm" style="color:var(--r);padding:2px 7px" onclick="delSub(' + m.id + ')">🗑</button></td>';

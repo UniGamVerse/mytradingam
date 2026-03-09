@@ -10,7 +10,8 @@ function f(n, d) {
   var result = parts[0] + (d > 0 ? ',' + parts[1] : '');
   return (n < 0 ? '-' : '') + result;
 }
-function fe(n) { return '€\u00a0' + f(n); }
+function fe(n)  { return '€\u00a0' + f(n); }
+function fe4(n) { return '€\u00a0' + f(n, 4); }  // prezzi unitari (azioni, NAV fondi)
 function fp(n) { return f(n) + '%'; }
 function cc(n) { return n > 0.001 ? 'pos' : n < -0.001 ? 'neg' : 'dmc'; }
 function fmtDate(d) {

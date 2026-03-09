@@ -97,6 +97,20 @@ function applySplit(ticker, ratio, date) {
   return count;
 }
 
+// Inverte uno split già applicato (usato da delOp per cancellare uno split)
+function reverseSplit(ticker, ratio, date) {
+  if (!ratio || ratio === 0) return;
+  var inverseRatio = 1 / ratio;
+  for (var i = 0; i < ops.length; i++) {
+    var op = ops[i];
+    if (op.ticker !== ticker) continue;
+    if (op.type === 'split') continue;
+    if (op.date > date) continue;
+    op.qty   = Math.round(op.qty   * inverseRatio * 1000000) / 1000000;
+    op.price = Math.round(op.price / inverseRatio  * 1000000) / 1000000;
+  }
+}
+
 // ---------- CAGR ----------
 function calcCAGR(cost, value, years) {
   if (cost <= 0 || value <= 0 || years < 0.01) return null;

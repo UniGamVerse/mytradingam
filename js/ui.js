@@ -185,7 +185,17 @@ function addOp() {
   renderAll(); fetchAll(false);
 }
 
-function delOp(id)  { ops = ops.filter(function(o){ return o.id !== id; }); save(); renderAll(); }
+function delOp(id) {
+  var op = ops.find(function(o) { return o.id === id; });
+  if (!op) return;
+  if (op.type === 'split') {
+    if (!confirm('Eliminando questo split/raggruppamento le quantità e i prezzi delle operazioni precedenti verranno ripristinati. Continuare?')) return;
+    reverseSplit(op.ticker, op.qty, op.date);
+  }
+  ops = ops.filter(function(o) { return o.id !== id; });
+  save();
+  renderAll();
+}
 
 function editOp(id) {
   var op = ops.find(function(o){ return o.id === id; });
@@ -223,6 +233,22 @@ function saveEditOp() {
   var note   = document.getElementById('eop-note').value.trim();
   if (!ticker || !date || isNaN(qty) || qty <= 0) { alert('Compila tutti i campi obbligatori.'); return; }
   if (type !== 'split' && (isNaN(price) || price <= 0)) { alert('Inserisci un prezzo valido.'); return; }
+  // Se era uno split e il ratio o la data è cambiata, inverte il vecchio e applica il nuovo
+  if (op.type === 'split' && type === 'split') {
+    var ratioChanged = op.qty !== qty;
+    var dateChanged  = op.date !== date;
+    var tickerChanged = op.ticker !== ticker;
+    if (ratioChanged || dateChanged || tickerChanged) {
+      reverseSplit(op.ticker, op.qty, op.date);
+      op.type = type; op.ticker = ticker; op.date = date;
+      op.qty = qty; op.price = 0; op.comm = 0;
+      op.note = note || '';
+      applySplit(ticker, qty, date);
+      save(); closeEditOpModal(); renderAll();
+      showToast('Split aggiornato ✓');
+      return;
+    }
+  }
   op.type = type; op.ticker = ticker; op.date = date;
   op.qty = qty; op.price = price; op.comm = comm;
   op.note = note || '';
