@@ -47,6 +47,7 @@ function loadGSheetPrices() {
       }
       gsheetCache      = newCache;
       gsheetLastUpdate = new Date();
+      if (typeof populateTickerSelect === 'function') populateTickerSelect();
       var lupd = document.getElementById('lupd');
       if (lupd) {
         var timeStr = gsheetLastUpdate.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit', second:'2-digit' });

@@ -21,6 +21,7 @@ function renderAll() {
   renderZnPanel();
   renderAlPanel();
   updateSmTickers();
+  if (typeof populateTickerSelect === 'function') populateTickerSelect();
 }
 
 // ---------- Header ----------

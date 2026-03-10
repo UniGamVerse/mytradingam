@@ -14,7 +14,30 @@ function showToast(msg, cls) {
   toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 4000);
 }
 
-// ---------- Theme ----------
+// ---------- Popola select ticker dal foglio prezzi ----------
+function populateTickerSelect() {
+  var sel = document.getElementById('f-ticker');
+  if (!sel) return;
+  var cur = sel.value;
+
+  // Raccoglie ticker: prima dalla cache prezzi, poi da ops esistenti come fallback
+  var tickers = Object.keys(gsheetCache).sort();
+  if (tickers.length === 0) {
+    // fallback: ticker già presenti nel portafoglio
+    for (var i = 0; i < ops.length; i++) {
+      if (tickers.indexOf(ops[i].ticker) === -1) tickers.push(ops[i].ticker);
+    }
+    tickers.sort();
+  }
+
+  var opts = '<option value="">— seleziona —</option>';
+  for (var j = 0; j < tickers.length; j++) {
+    var tk = tickers[j];
+    var nm = (gsheetCache[tk] && gsheetCache[tk].name) ? ' — ' + gsheetCache[tk].name : '';
+    opts += '<option value="' + tk + '"' + (tk === cur ? ' selected' : '') + '>' + tk + nm + '</option>';
+  }
+  sel.innerHTML = opts;
+}
 function applyTheme() {
   var theme = isDark ? 'dark' : (isWarm ? 'warm' : 'light');
   document.documentElement.setAttribute('data-theme', theme);
@@ -178,9 +201,10 @@ function addOp() {
 
   ops.push({ id: Date.now(), type: type, ticker: ticker, date: date, qty: qty, price: price, comm: comm });
   save();
-  document.getElementById('f-qty').value   = '';
-  document.getElementById('f-price').value = '';
-  document.getElementById('f-comm').value  = '0';
+  document.getElementById('f-ticker').value = '';
+  document.getElementById('f-qty').value    = '';
+  document.getElementById('f-price').value  = '';
+  document.getElementById('f-comm').value   = '2.95';
   if (Object.keys(gsheetCache).length > 0 && !gsheetCache[ticker]) {
     showToast('⚠ ' + ticker + ' non è nel foglio prezzi — il prezzo non si aggiornerà in tempo reale.', 'ta');
   }
