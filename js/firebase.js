@@ -25,21 +25,23 @@ function signInWithGoogle() {
   isSigningIn = true;
   var provider = new firebase.auth.GoogleAuthProvider();
   provider.addScope('https://www.googleapis.com/auth/drive.file');
-  auth.signInWithPopup(provider).then(function(result) {
-    if (result.credential) {
-      driveToken = result.credential.accessToken;
-      try { localStorage.setItem('pd3_drive_token', driveToken); } catch(e) {}
-    }
-  }).catch(function(e) {
-    if (e.code !== 'auth/cancelled-popup-request' && e.code !== 'auth/popup-closed-by-user') {
-      var el = document.getElementById('login-err');
-      el.textContent = 'Errore: ' + e.message;
-      el.style.display = 'block';
-    }
-  }).finally(function() {
+  // Usa redirect invece di popup: compatibile con GitHub Pages (COOP policy blocca i popup)
+  auth.signInWithRedirect(provider).catch(function(e) {
+    var el = document.getElementById('login-err');
+    if (el) { el.textContent = 'Errore: ' + e.message; el.style.display = 'block'; }
     isSigningIn = false;
   });
 }
+
+// Gestisce il ritorno dal redirect Google
+auth.getRedirectResult().then(function(result) {
+  if (result && result.credential) {
+    driveToken = result.credential.accessToken;
+    try { localStorage.setItem('pd3_drive_token', driveToken); } catch(e) {}
+  }
+}).catch(function(e) {
+  console.error('[Auth] Errore redirect:', e);
+});
 
 function signOut() {
   if (!confirm('Uscire?')) return;
