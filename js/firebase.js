@@ -25,21 +25,42 @@ function signInWithGoogle() {
   isSigningIn = true;
   var provider = new firebase.auth.GoogleAuthProvider();
   provider.addScope('https://www.googleapis.com/auth/drive.file');
+  // Prova popup; se bloccato dal browser usa redirect
   auth.signInWithPopup(provider).then(function(result) {
     if (result.credential) {
       driveToken = result.credential.accessToken;
       try { localStorage.setItem('pd3_drive_token', driveToken); } catch(e) {}
     }
-  }).catch(function(e) {
-    if (e.code !== 'auth/cancelled-popup-request' && e.code !== 'auth/popup-closed-by-user') {
-      var el = document.getElementById('login-err');
-      el.textContent = 'Errore: ' + e.message;
-      el.style.display = 'block';
-    }
-  }).finally(function() {
     isSigningIn = false;
+  }).catch(function(e) {
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user') {
+      try { localStorage.setItem('pd3_redirect_login', '1'); } catch(ex) {}
+      auth.signInWithRedirect(provider);
+    } else if (e.code !== 'auth/cancelled-popup-request') {
+      var el = document.getElementById('login-err');
+      if (el) { el.textContent = 'Errore: ' + e.message; el.style.display = 'block'; }
+      isSigningIn = false;
+    } else {
+      isSigningIn = false;
+    }
   });
 }
+
+// Gestisce il ritorno dal redirect (solo se era stato avviato un redirect)
+(function() {
+  var wasRedirect = false;
+  try { wasRedirect = localStorage.getItem('pd3_redirect_login') === '1'; } catch(e) {}
+  if (!wasRedirect) return;
+  try { localStorage.removeItem('pd3_redirect_login'); } catch(e) {}
+  auth.getRedirectResult().then(function(result) {
+    if (result && result.credential) {
+      driveToken = result.credential.accessToken;
+      try { localStorage.setItem('pd3_drive_token', driveToken); } catch(e) {}
+    }
+  }).catch(function(e) {
+    console.error('[Auth] Errore redirect result:', e);
+  });
+}());
 
 function signOut() {
   if (!confirm('Uscire?')) return;
