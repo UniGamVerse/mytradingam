@@ -63,7 +63,7 @@ function signInWithGoogle() {
 }());
 
 function signOut() {
-  if (!confirm('Uscire?')) return;
+  if (!confirm('Ricordati di salvare il portafoglio (↓ Salva) prima di uscire.\n\nEscire ora?')) return;
   auth.signOut();
 }
 

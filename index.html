@@ -33,7 +33,8 @@
       <label>Nome portafoglio</label>
       <input id="setup-name" placeholder="es. Portfolio Desk Gam" maxlength="50">
     </div>
-    <button class="btn btn-g" style="width:100%" onclick="saveSetup()">▶ Inizia</button>
+    <button class="btn btn-g" style="width:100%;margin-bottom:10px" onclick="saveSetup()">▶ Nuovo portafoglio</button>
+    <button class="btn" style="width:100%;background:var(--b2);color:var(--fg)" onclick="document.getElementById('modal-setup').classList.remove('open');openImport()">↑ Importa portafoglio esistente</button>
   </div>
 </div>
 
@@ -541,9 +542,9 @@
 </footer>
 
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <!-- App modules — ordine di caricamento importante -->
 <script src="js/state.js"></script>
